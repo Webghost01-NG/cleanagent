@@ -1,9 +1,16 @@
 "use client";
 import React, { useState } from 'react';
-import { Layers, ShieldCheck, CheckCircle2, ExternalLink, Hash, Clock, FileCode } from 'lucide-react';
+import { Layers, ShieldCheck, CheckCircle2, ExternalLink, Hash, Clock, Copy, Check } from 'lucide-react';
 
 export default function AgentAuditExplorer({ auditLogs = [] }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [copiedTxHash, setCopiedTxHash] = useState(null);
+
+  const handleCopyHash = (txHash) => {
+    navigator.clipboard.writeText(txHash);
+    setCopiedTxHash(txHash);
+    setTimeout(() => setCopiedTxHash(null), 2000);
+  };
 
   const filteredLogs = auditLogs.filter(log => {
     const term = searchTerm.toLowerCase();
@@ -63,7 +70,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                 <th className="p-4">Target Vault</th>
                 <th className="p-4">Rebalance Amount</th>
                 <th className="p-4">CVI Identity Tier</th>
-                <th className="p-4">CVA Provenance Tx Hash</th>
+                <th className="p-4">CVA Provenance Tx Hash (66-Char EVM)</th>
               </tr>
             </thead>
             <tbody className="divide-y theme-border theme-text">
@@ -100,16 +107,31 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                       </span>
                     </td>
 
-                    <td className="p-4 font-mono text-[11px] text-purple-600 dark:text-[#b87cf8]">
-                      <a
-                        href={`https://testnet.monadexplorer.com/tx/${log.txHash}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:underline flex items-center gap-1"
-                      >
-                        {log.txHash?.slice(0, 14)}...{log.txHash?.slice(-6)}
-                        <ExternalLink className="w-3 h-3 opacity-60" />
-                      </a>
+                    <td className="p-4 font-mono text-[11px]">
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={`https://testnet.monadexplorer.com/tx/${log.txHash}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="View on Monad Testnet Explorer"
+                          className="text-purple-600 dark:text-[#b87cf8] hover:underline flex items-center gap-1 font-bold"
+                        >
+                          {log.txHash?.slice(0, 10)}...{log.txHash?.slice(-8)}
+                          <ExternalLink className="w-3 h-3 opacity-60" />
+                        </a>
+
+                        <button
+                          onClick={() => handleCopyHash(log.txHash)}
+                          className="p-1 rounded theme-subcard hover:theme-card theme-text-muted hover:theme-text transition-colors cursor-pointer"
+                          title="Copy Full 66-Char EVM Transaction Hash"
+                        >
+                          {copiedTxHash === log.txHash ? (
+                            <Check className="w-3 h-3 text-emerald-500" />
+                          ) : (
+                            <Copy className="w-3 h-3 opacity-70" />
+                          )}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

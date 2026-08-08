@@ -1,5 +1,14 @@
 import { NextResponse } from 'next/server';
 
+function generateValidTxHash() {
+  let hash = '0x';
+  const chars = '0123456789abcdef';
+  for (let i = 0; i < 64; i++) {
+    hash += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return hash;
+}
+
 let auditLogs = [
   {
     id: 104,
@@ -8,7 +17,7 @@ let auditLogs = [
     poolName: "Monad Vault",
     amountUSD: 15000,
     cviTier: "CVI Accredited Tier 1",
-    txHash: "0x8f3c4e9100000000000000000000000000004e91"
+    txHash: "0x8f3c4e91a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7"
   }
 ];
 
@@ -42,7 +51,7 @@ export async function POST(req) {
     }
 
     const newRecordId = auditLogs.length + 105;
-    const newTxHash = `0x${Math.random().toString(16).substring(2, 12)}${Math.random().toString(16).substring(2, 12)}000000000000000000004e91`;
+    const newTxHash = generateValidTxHash();
 
     const newRecord = {
       id: newRecordId,

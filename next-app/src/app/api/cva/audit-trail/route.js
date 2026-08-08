@@ -9,7 +9,7 @@ export async function GET() {
       poolName: "Monad Vault",
       amountUSD: 15000,
       cviTier: "CVI Accredited Tier 1",
-      txHash: "0x8f3c4e9100000000000000000000000000004e91"
+      txHash: "0x8f3c4e91a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7"
     },
     {
       id: 103,
@@ -18,7 +18,7 @@ export async function GET() {
       poolName: "Ethereum RWA Treasury Vault",
       amountUSD: 25000,
       cviTier: "CVI Accredited Tier 1",
-      txHash: "0x2546bcd30000000000000000000000000000c30a"
+      txHash: "0x2546bcd3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d78f3c4e91"
     }
   ]);
 }
