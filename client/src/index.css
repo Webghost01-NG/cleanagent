@@ -5,8 +5,9 @@
     --bg-main: #fafafa;
     --bg-card: #ffffff;
     --bg-subcard: #f3f4f6;
+    --bg-input: #ffffff;
     --text-primary: #111827;
-    --text-muted: #6b7280;
+    --text-muted: #4b5563;
     --border-color: #e5e7eb;
     --primary-accent: #9333ea;
   }
@@ -15,29 +16,26 @@
     --bg-main: #0f0e17;
     --bg-card: #181724;
     --bg-subcard: #1f1e2e;
+    --bg-input: #181724;
     --text-primary: #f4f3fb;
     --text-muted: #9a98b0;
     --border-color: #2a283c;
     --primary-accent: #b87cf8;
   }
 
-  body {
-    background-color: var(--bg-main);
-    color: var(--text-primary);
+  html, body {
+    background-color: var(--bg-main) !important;
+    color: var(--text-primary) !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     overflow-x: hidden;
     transition: background-color 0.25s ease, color 0.25s ease;
   }
-
-  /* Force all standard elements to inherit theme text color unless explicitly highlighted */
-  h1, h2, h3, h4, h5, h6, p, span, div, label, input, select, textarea, button {
-    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
-  }
 }
 
-/* Theme Adaptive Utility Classes */
+/* Force all custom theme elements to respect CSS variables */
 .theme-bg {
   background-color: var(--bg-main) !important;
+  color: var(--text-primary) !important;
 }
 
 .theme-card {
@@ -48,6 +46,12 @@
 
 .theme-subcard {
   background-color: var(--bg-subcard) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-input {
+  background-color: var(--bg-input) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-primary) !important;
 }
@@ -64,7 +68,7 @@
   border-color: var(--border-color) !important;
 }
 
-/* Kwala Active Tab styling */
+/* Active Tab Highlight */
 .nav-tab-active {
   background-color: var(--primary-accent) !important;
   color: #ffffff !important;
@@ -72,13 +76,13 @@
   box-shadow: 0 4px 14px rgba(147, 51, 234, 0.35) !important;
 }
 
-/* Kwala Grid Dot Background */
-.dark .kwala-dot-grid {
+/* Radial Dot Grid Background */
+.dark .agent-dot-grid {
   background-image: radial-gradient(circle, rgba(184, 124, 248, 0.08) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
-.kwala-dot-grid {
+.agent-dot-grid {
   background-image: radial-gradient(circle, rgba(147, 51, 234, 0.08) 1px, transparent 1px);
   background-size: 28px 28px;
 }
