@@ -1,32 +1,34 @@
 import React, { useState } from 'react';
-import { FileText, Copy, Check, ExternalLink } from 'lucide-react';
+import { FileText, Copy, Check } from 'lucide-react';
 
 export default function SummaryModal({ isOpen, onClose }) {
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
 
-  const summaryText = `# 🏰 EstateKey — One-Page Protocol & Submission Summary
+  const summaryText = `# 🤖 CleanAgent Protocol — One-Page Protocol & Submission Summary
 
-Project Name: EstateKey  
+Project Name: CleanAgent Protocol  
+Hackathon Track: Track 02 — Compliant DeFi  
 Submission Email: isaac@cleanverse.com  
-Deployed Chain(s): Cleanverse EVM Testnet, Base Sepolia, Ethereum Mainnet  
+Cleanverse Primitive: Cleanverse Capability #8 (Agent Skill Framework)  
+Deployed Chain(s): Monad Protocol Testnet, Cleanverse EVM Testnet, Base Mainnet, Arbitrum One  
 
 1. 🎯 Problem Statement
-Real-World Assets (real estate, commercial property, debt instruments) are historically illiquid and difficult to trade in fractional pieces. While Web3 tokenization promises 24/7 liquidity, it creates a massive regulatory barrier: securities laws require that only verified and accredited investors hold fractional equity in real-world assets. Traditional ERC-20 or NFT tokens have no concept of recipient identity, allowing any unverified wallet to hold restricted shares.
+DeFi yield farming and automated liquidity management are complex, manual, and exposed to severe compliance risks. Existing AI yield bots run blindly without checking regulatory compliance, risking funds in unverified or sanctioned liquidity pools. Standard Web3 protocols cannot enforce programmable mandates or counterparty identity verification before an autonomous agent executes a trade or deposit on-chain.
 
-2. 💡 Solution Overview — EstateKey
-EstateKey solves real estate RWA compliance at the protocol level using Cleanverse infrastructure:
-- Fractional Share Tokenization: Property equity is split into on-chain shares ($500,000 house -> 10,000 shares @ $50/share).
-- Protocol-Enforced Identity Compliance: Before any transfer occurs, the smart contract queries Cleanverse Verified Identity (CVI) credentials on-chain.
-- Automated On-Chain Guardrails: If an unverified or non-accredited wallet attempts to receive shares, the smart contract automatically reverts the transaction with a CVI Error 403.
-- Immutable Asset Provenance: Every mint, transfer, and blocked compliance attempt is logged to the Cleanverse Verified Assets (CVA) audit ledger with a cryptographic hash.
+2. 💡 Solution Overview — CleanAgent Protocol
+CleanAgent Protocol is an Autonomous Compliant DeFi & Yield Management Engine built directly on Cleanverse Capability #8 (Agent Skill Framework):
+- Programmable Agent Mandates: Users define spend limits (max $25,000/tx), target APY yield thresholds (min 7.00% APY), and counterparty compliance rules for their AI agent.
+- CVI Counterparty Validation: Before executing any automated deposit or rebalance, the Agent queries Cleanverse Verified Identity (CVI) credentials on-chain.
+- Automated On-Chain Guardrails: If a target pool is unverified or non-compliant, the Agent automatically aborts execution on-chain with a CVI Error 403.
+- Immutable Mandate Audit Provenance: Every autonomous trade, spend control limit, and mandate cycle is logged to Cleanverse Verified Assets (CVA) with a cryptographic mandate hash.
 
 3. ⚙️ CVI & CVA Integration Points
-- CVI Identity Registry (CVIIdentityRegistry.sol): Stores on-chain KYC tiers, accredited investor status, country jurisdiction codes, and cryptographic CVI certificate hashes.
-- CVI Guardrail Hook (EstateKeyPropertyToken.sol): Implements _validateCompliance(from, to, amount) transfer hook. Reverts instantly if recipient fails compliance.
-- CVA Audit Ledger (CVAAuditWrapper.sol): Cryptographically logs CVATransferLogged for compliant transfers and CVAComplianceBlocked for rejected attempts with provenance hashes.
-- Live Telemetry & API (server/index.js): Express API backend providing real-time compliance evaluation endpoints and live audit trail indexing.
+- Capability #8 (Agent Skill Framework): CleanAgentVault.sol enforces programmable mandate parameters, daily spend caps, and autonomous execution logic.
+- Cleanverse Verified Identity (CVI): CVIIdentityRegistry.sol on-chain attestation registry queries cviRegistry.isVerified(pool) before executing any agent rebalance.
+- Cleanverse Verified Assets (CVA): CVAAuditWrapper.sol logs CVAExecutionLogged for all compliant rebalances and blocked CVI violations with cryptographic provenance hashes.
+- REST Telemetry API: server/index.js (/api/agent/run) serves live yield pool telemetry and agent execution triggers.
 `;
 
   const handleCopy = () => {
@@ -37,13 +39,13 @@ EstateKey solves real estate RWA compliance at the protocol level using Cleanver
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="glass-panel w-full max-w-2xl p-6 space-y-4 border-sky-500/40 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div className="glass-panel w-full max-w-2xl p-6 space-y-4 border-purple-500/40 shadow-2xl relative max-h-[90vh] overflow-y-auto">
         
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-sky-400" />
-            <h3 className="text-lg font-bold text-white">One-Page Protocol & Submission Summary</h3>
+            <FileText className="w-5 h-5 text-purple-400" />
+            <h3 className="text-lg font-bold text-white">One-Page Submission Summary</h3>
           </div>
           <button 
             onClick={onClose}

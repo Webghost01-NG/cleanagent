@@ -1,28 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
-import OnboardingBanner from './components/OnboardingBanner';
-import SimpleMarketplace from './components/SimpleMarketplace';
-import MyPortfolioAndTransfers from './components/MyPortfolioAndTransfers';
+import AgentControlPanel from './components/AgentControlPanel';
+import CompliantPools from './components/CompliantPools';
+import AgentAuditExplorer from './components/AgentAuditExplorer';
 import WalletModal from './components/WalletModal';
-import TokenizeModal from './components/TokenizeModal';
 import SummaryModal from './components/SummaryModal';
-import KYCModal from './components/KYCModal';
 import { connectEVMWallet, connectPhantomWallet } from './services/web3';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Bot, Cpu } from 'lucide-react';
 
 const API_BASE = 'http://localhost:5001/api';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('marketplace'); // 'marketplace' | 'portfolio'
+  const [activeTab, setActiveTab] = useState('control'); // 'control' | 'pools' | 'audit'
   const [currentWallet, setCurrentWallet] = useState('0x2546BcD3c84621e976D8185a91A922aE77ECEc30'); // Default Charlie
-  const [selectedNetwork, setSelectedNetwork] = useState('cleanverse');
+  const [selectedNetwork, setSelectedNetwork] = useState('monad');
   
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
-  const [isTokenizeModalOpen, setIsTokenizeModalOpen] = useState(false);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
-  const [isKYCModalOpen, setIsKYCModalOpen] = useState(false);
 
-  const [properties, setProperties] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [pools, setPools] = useState([]);
+  const [mandate, setMandate] = useState({
+    maxSpendPerTxUSD: 25000,
+    maxDailySpendUSD: 100000,
+    currentDailySpendUSD: 10000,
+    minRequiredYieldBps: 700,
+    requireAccreditedPoolOnly: false,
+    isAgentActive: true
+  });
   const [identities, setIdentities] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,17 +36,21 @@ export default function App() {
   const fetchProtocolData = async () => {
     try {
       setLoading(true);
-      const [resProps, resIdentities, resAudit] = await Promise.all([
-        fetch(`${API_BASE}/properties`).then(r => r.json()),
+      const [resStats, resPools, resMandate, resIdentities, resAudit] = await Promise.all([
+        fetch(`${API_BASE}/stats`).then(r => r.json()),
+        fetch(`${API_BASE}/pools`).then(r => r.json()),
+        fetch(`${API_BASE}/agent/mandate`).then(r => r.json()),
         fetch(`${API_BASE}/cvi/identities`).then(r => r.json()),
         fetch(`${API_BASE}/cva/audit-trail`).then(r => r.json())
       ]);
 
-      setProperties(resProps);
+      setStats(resStats);
+      setPools(resPools);
+      setMandate(resMandate);
       setIdentities(resIdentities);
       setAuditLogs(resAudit);
     } catch (err) {
-      console.error("Error connecting to Cleanverse Protocol Backend:", err);
+      console.error("Error connecting to CleanAgent Protocol Backend:", err);
     } finally {
       setLoading(false);
     }
@@ -74,10 +83,10 @@ export default function App() {
     }
   };
 
-  // Tokenize Property Handler
-  const handleListProperty = async (payload) => {
+  // Run Autonomous Agent Cycle Handler
+  const handleRunAgentCycle = async (payload) => {
     try {
-      const res = await fetch(`${API_BASE}/properties`, {
+      const res = await fetch(`${API_BASE}/agent/run`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -90,10 +99,10 @@ export default function App() {
     }
   };
 
-  // Buy Shares Handler
-  const handleBuyShares = async (payload) => {
+  // Update Agent Mandate Handler
+  const handleUpdateMandate = async (payload) => {
     try {
-      const res = await fetch(`${API_BASE}/transfer`, {
+      const res = await fetch(`${API_BASE}/agent/mandate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -103,50 +112,17 @@ export default function App() {
       return data;
     } catch (err) {
       return { success: false, error: err.message };
-    }
-  };
-
-  // Transfer Handler
-  const handleExecuteTransfer = async (payload) => {
-    try {
-      const res = await fetch(`${API_BASE}/transfer`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      await fetchProtocolData();
-      return data;
-    } catch (err) {
-      return { success: false, error: err.message };
-    }
-  };
-
-  // Issue CVI Verification Handler
-  const handleVerifyIdentity = async (payload) => {
-    try {
-      const res = await fetch(`${API_BASE}/cvi/verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      await fetchProtocolData();
-      return data;
-    } catch (err) {
-      return { success: false, message: err.message };
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white">
+    <div className="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
       
       {/* Top Navbar */}
       <Navbar
         currentWallet={currentWallet}
         identities={identities}
         onOpenWalletModal={() => setIsWalletModalOpen(true)}
-        onOpenTokenizeModal={() => setIsTokenizeModalOpen(true)}
         onOpenSummaryModal={() => setIsSummaryModalOpen(true)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -157,41 +133,35 @@ export default function App() {
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8 flex-1 w-full">
         
-        {/* Beginner Stepper Onboarding Banner */}
-        <OnboardingBanner
-          currentWallet={currentWallet}
-          identities={identities}
-          onOpenWallet={() => setIsWalletModalOpen(true)}
-          onOpenKYC={() => setIsKYCModalOpen(true)}
-          onSelectTab={setActiveTab}
-        />
-
         {/* Tab Views */}
         {loading ? (
           <div className="glass-panel p-12 text-center text-slate-400 font-mono space-y-3">
-            <div className="w-8 h-8 border-4 border-sky-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p>Connecting to EstateKey Protocol Server...</p>
+            <div className="w-8 h-8 border-4 border-purple-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p>Connecting to CleanAgent Protocol Server...</p>
           </div>
         ) : (
           <>
-            {activeTab === 'marketplace' && (
-              <SimpleMarketplace
-                properties={properties}
+            {activeTab === 'control' && (
+              <AgentControlPanel
+                pools={pools}
+                mandate={mandate}
+                onRunAgentCycle={handleRunAgentCycle}
+                onUpdateMandate={handleUpdateMandate}
                 currentWallet={currentWallet}
                 identities={identities}
-                onBuyShares={handleBuyShares}
-                onOpenKYC={() => setIsKYCModalOpen(true)}
               />
             )}
 
-            {activeTab === 'portfolio' && (
-              <MyPortfolioAndTransfers
-                properties={properties}
-                identities={identities}
-                currentWallet={currentWallet}
-                onExecuteTransfer={handleExecuteTransfer}
+            {activeTab === 'pools' && (
+              <CompliantPools
+                pools={pools}
+                mandate={mandate}
+              />
+            )}
+
+            {activeTab === 'audit' && (
+              <AgentAuditExplorer
                 auditLogs={auditLogs}
-                onOpenKYC={() => setIsKYCModalOpen(true)}
               />
             )}
           </>
@@ -209,37 +179,23 @@ export default function App() {
         identities={identities}
       />
 
-      <TokenizeModal
-        isOpen={isTokenizeModalOpen}
-        onClose={() => setIsTokenizeModalOpen(false)}
-        onListProperty={handleListProperty}
-      />
-
       <SummaryModal
         isOpen={isSummaryModalOpen}
         onClose={() => setIsSummaryModalOpen(false)}
-      />
-
-      <KYCModal
-        isOpen={isKYCModalOpen}
-        onClose={() => setIsKYCModalOpen(false)}
-        currentWallet={currentWallet}
-        identities={identities}
-        onVerifyIdentity={handleVerifyIdentity}
       />
 
       {/* Footer */}
       <footer className="border-t border-slate-800/80 bg-[#090d16]/90 backdrop-blur-md py-6 px-4 text-center text-xs font-mono text-slate-400">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-sky-400" />
-            <span>EstateKey &copy; 2026 — Compliant Real Estate RWA Protocol</span>
+            <Bot className="w-4 h-4 text-purple-400" />
+            <span>CleanAgent Protocol &copy; 2026 — Cleanverse Capability #8 Agent Skill Framework</span>
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
-            <button onClick={() => setIsSummaryModalOpen(true)} className="text-sky-400 hover:underline">One-Page Summary</button>
-            <button onClick={() => setIsKYCModalOpen(true)} className="text-emerald-400 hover:underline">Get CVI Verified</button>
-            <span className="text-purple-400">Cleanverse Protocol</span>
+            <button onClick={() => setIsSummaryModalOpen(true)} className="text-purple-400 hover:underline">One-Page Summary</button>
+            <span className="text-emerald-400">CVI Verified Identity</span>
+            <span className="text-sky-400">CVA Audit Provenance</span>
           </div>
         </div>
       </footer>
