@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { Sun, Moon, GitFork, Menu, X, Wallet, ChevronDown, Zap, ShieldCheck } from 'lucide-react';
+import { Sun, Moon, GitFork, Menu, X, Wallet, ChevronDown } from 'lucide-react';
 
 export default function Navbar({ 
   activeTab, 
@@ -22,6 +22,18 @@ export default function Navbar({
     { id: "audit", label: "Audit" },
     { id: "docs", label: "Docs" },
   ];
+
+  const handleGetStartedClick = () => {
+    if (!currentWallet) {
+      onOpenWalletModal();
+    } else {
+      setActiveTab('control');
+      setTimeout(() => {
+        const elem = document.getElementById('agent-control-panel-section');
+        if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full theme-border border-b theme-card backdrop-blur-md">
@@ -113,7 +125,7 @@ export default function Navbar({
 
           {/* Get Started Pill Button */}
           <button
-            onClick={() => setActiveTab('control')}
+            onClick={handleGetStartedClick}
             className="ml-2 inline-flex items-center rounded-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 font-mono text-[11px] tracking-wider font-bold uppercase shadow-lg shadow-purple-500/20 transition-all hover:scale-105 cursor-pointer"
           >
             Get Started
@@ -163,6 +175,15 @@ export default function Navbar({
               {link.label}
             </button>
           ))}
+          <button
+            onClick={() => {
+              setMobileOpen(false);
+              handleGetStartedClick();
+            }}
+            className="w-full text-center py-2.5 rounded-xl bg-purple-600 text-white font-bold font-mono uppercase"
+          >
+            Get Started
+          </button>
         </div>
       )}
     </header>
