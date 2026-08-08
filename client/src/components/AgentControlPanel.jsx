@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bot, Play, ShieldAlert, ShieldCheck, CheckCircle2, AlertOctagon, Cpu, DollarSign, Sliders, ArrowRight, RefreshCw, Zap } from 'lucide-react';
+import { Bot, Play, ShieldAlert, ShieldCheck, CheckCircle2, AlertOctagon, Cpu, DollarSign, Sliders, ArrowRight, Zap, Sparkles, Activity } from 'lucide-react';
 
 export default function AgentControlPanel({ 
   pools, 
@@ -26,13 +26,13 @@ export default function AgentControlPanel({
       { step: 1, text: "Reading Cleanverse Agent Skill Mandate parameters...", status: "pending" }
     ]);
 
-    await new Promise(r => setTimeout(r, 300));
+    await new Promise(r => setTimeout(r, 350));
     setEvaluationSteps(prev => [
       { step: 1, text: `Mandate Check: Per-Tx Limit $${mandate.maxSpendPerTxUSD.toLocaleString()} USD`, status: rebalanceAmountUSD <= mandate.maxSpendPerTxUSD ? "pass" : "fail" },
       { step: 2, text: `Target Yield Check: Pool ${currentPool.apyPercent}% APY vs Required ${(mandate.minRequiredYieldBps / 100)}% APY`, status: "pending" }
     ]);
 
-    await new Promise(r => setTimeout(r, 400));
+    await new Promise(r => setTimeout(r, 450));
     const yieldPass = currentPool.apyPercent >= (mandate.minRequiredYieldBps / 100);
     setEvaluationSteps(prev => [
       prev[0],
@@ -40,7 +40,7 @@ export default function AgentControlPanel({
       { step: 3, text: `Evaluating Cleanverse CVI Counterparty Clearance (${currentPool.name})...`, status: "pending" }
     ]);
 
-    await new Promise(r => setTimeout(r, 400));
+    await new Promise(r => setTimeout(r, 450));
     
     // Execute backend agent cycle
     const result = await onRunAgentCycle({
@@ -60,32 +60,39 @@ export default function AgentControlPanel({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       
-      {/* Top Kicker Banner */}
-      <div className="glass-panel p-6 border-purple-500/30 bg-gradient-to-r from-purple-950/30 via-slate-900 to-indigo-950/20">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
+      {/* Hero Highlight Banner */}
+      <div className="glass-panel p-8 relative overflow-hidden border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-[#0d1324] to-indigo-950/30">
+        <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
+          <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-mono text-xs font-bold uppercase flex items-center gap-1.5">
+              <span className="px-3.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-mono text-xs font-bold uppercase flex items-center gap-1.5 shadow-lg">
                 <Bot className="w-4 h-4 text-purple-400" />
-                AUTONOMOUS DEFI AGENT
+                AUTONOMOUS DEFI AGENT ENGINE
               </span>
-              <span className="text-xs font-mono text-slate-400 font-semibold">Cleanverse Capability #8: Agent Skill Framework</span>
+              <span className="text-xs font-mono text-slate-400 font-semibold flex items-center gap-1">
+                <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                Capability #8: Agent Skill Framework
+              </span>
             </div>
-            <h2 className="text-2xl font-extrabold text-white mt-2">
-              Autonomous Compliant Yield & Rebalance Engine
+            
+            <h2 className="text-3xl lg:text-4xl font-black tracking-tight text-white">
+              Autonomous Compliant Yield & Rebalance Platform
             </h2>
-            <p className="text-sm text-slate-300 mt-1 max-w-3xl leading-relaxed">
-              CleanAgent continuously scans target liquidity pools, checks **Cleanverse Verified Identity (CVI)** counterparty credentials on-chain, enforces spend limits, and executes automated rebalance mandates with cryptographic **CVA audit logging**.
+            
+            <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
+              CleanAgent continuously evaluates target liquidity pools, checks **Cleanverse Verified Identity (CVI)** counterparty credentials on-chain, enforces spend limits, and executes automated rebalance mandates with cryptographic **CVA audit logging**.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
             <button
               onClick={handleTriggerAgentCycle}
               disabled={isExecuting}
-              className="btn-primary py-3.5 px-6 text-base flex items-center gap-2.5 shadow-xl shadow-purple-500/25"
+              className="btn-primary w-full sm:w-auto py-4 px-8 text-base flex items-center justify-center gap-3 shadow-2xl shadow-purple-500/30"
             >
               {isExecuting ? (
                 <>
@@ -95,140 +102,162 @@ export default function AgentControlPanel({
               ) : (
                 <>
                   <Zap className="w-5 h-5 text-amber-300 fill-amber-300" />
-                  Run Autonomous Agent Cycle
+                  Run Autonomous Agent Execution
                 </>
               )}
             </button>
           </div>
         </div>
+
+        {/* Live Metrics Pill Strip */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-800/80 font-mono">
+          <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+            <span className="text-slate-400 text-[10px] uppercase block">AGENT MANDATE STATUS</span>
+            <span className="text-emerald-400 font-bold text-sm flex items-center gap-1.5 mt-0.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              ACTIVE & MONITORING
+            </span>
+          </div>
+
+          <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+            <span className="text-slate-400 text-[10px] uppercase block">MAX PER-TX LIMIT</span>
+            <span className="text-white font-bold text-sm mt-0.5 block">${mandate.maxSpendPerTxUSD.toLocaleString()} USD</span>
+          </div>
+
+          <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+            <span className="text-slate-400 text-[10px] uppercase block">MIN APY TARGET</span>
+            <span className="text-purple-300 font-bold text-sm mt-0.5 block">{(mandate.minRequiredYieldBps / 100)}% APY</span>
+          </div>
+
+          <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+            <span className="text-slate-400 text-[10px] uppercase block">COUNTERPARTY RULE</span>
+            <span className="text-emerald-400 font-bold text-sm mt-0.5 block">Cleanverse CVI Required</span>
+          </div>
+        </div>
       </div>
 
-      {/* Main Grid: Control Panel & Live Evaluation Trace */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Main Interactive Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Left: Configure Agent Cycle */}
-        <div className="lg:col-span-2 glass-panel p-6 space-y-5">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
-            <Sliders className="w-5 h-5 text-purple-400" />
-            Configure Autonomous Agent Mandate & Target Pool
-          </h3>
+        {/* Left: Configure Mandate & Pool */}
+        <div className="lg:col-span-2 glass-panel p-8 space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
+            <div className="flex items-center gap-2.5">
+              <Sliders className="w-5 h-5 text-purple-400" />
+              <h3 className="text-xl font-bold text-white">Configure Autonomous Rebalance Mandate</h3>
+            </div>
+            <span className="text-xs font-mono text-slate-400">Step 1 of 2</span>
+          </div>
 
           <div>
-            <label className="text-xs font-mono text-slate-400 block mb-1">SELECT TARGET LIQUIDITY POOL FOR REBALANCE:</label>
+            <label className="text-xs font-mono text-slate-400 block mb-2 font-semibold">SELECT TARGET DEFI LIQUIDITY POOL:</label>
             <select
               value={selectedPoolId}
               onChange={(e) => setSelectedPoolId(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 text-white text-xs font-mono rounded-xl p-3 focus:outline-none focus:border-purple-500 cursor-pointer"
+              className="w-full bg-slate-950 border border-slate-700/80 text-white text-sm font-mono rounded-xl p-3.5 focus:outline-none focus:border-purple-500 cursor-pointer shadow-inner"
             >
               {pools.map(p => (
                 <option key={p.id} value={p.id}>
-                  {p.name} ({p.ticker}) — {p.apyPercent}% APY | {p.isCVIVerified ? 'CVI Verified' : '⚠️ UNVERIFIED POOL (WILL REVERT)'}
+                  {p.name} ({p.ticker}) — {p.apyPercent}% APY | {p.isCVIVerified ? 'Cleanverse CVI Verified' : '⚠️ UNVERIFIED POOL (WILL REVERT)'}
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+          {/* Amount Slider */}
+          <div className="bg-slate-950/80 p-5 rounded-2xl border border-slate-800/80 space-y-3 font-mono">
+            <div className="flex justify-between items-center">
+              <label className="text-xs text-slate-300 font-bold">REBALANCE EXECUTION AMOUNT:</label>
+              <span className="text-2xl font-black text-emerald-400">${rebalanceAmountUSD.toLocaleString()} USD</span>
+            </div>
             
-            {/* Rebalance Amount Slider */}
-            <div className="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-slate-400 font-bold">REBALANCE AMOUNT:</span>
-                <span className="text-lg font-bold text-emerald-400">${rebalanceAmountUSD.toLocaleString()} USD</span>
-              </div>
-              <input
-                type="range"
-                min="1000"
-                max="50000"
-                step="1000"
-                value={rebalanceAmountUSD}
-                onChange={(e) => setRebalanceAmountUSD(parseInt(e.target.value))}
-                className="w-full accent-purple-400 cursor-pointer"
-              />
-              <span className="text-[10px] text-slate-400 block">Max Single Tx Limit: ${mandate.maxSpendPerTxUSD.toLocaleString()}</span>
+            <input
+              type="range"
+              min="1000"
+              max="50000"
+              step="1000"
+              value={rebalanceAmountUSD}
+              onChange={(e) => setRebalanceAmountUSD(parseInt(e.target.value))}
+              className="w-full accent-purple-500 cursor-pointer h-2 bg-slate-900 rounded-lg"
+            />
+            
+            <div className="flex justify-between text-[11px] text-slate-400 pt-1">
+              <span>Min: $1,000</span>
+              <span>Max Tx Limit: ${mandate.maxSpendPerTxUSD.toLocaleString()}</span>
             </div>
-
-            {/* Mandate Constraints */}
-            <div className="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-1.5">
-              <span className="text-slate-400 block font-bold text-[10px] uppercase">ACTIVE MANDATE CONSTRAINTS:</span>
-              <div className="flex justify-between">
-                <span className="text-slate-400">MIN YIELD REQ:</span>
-                <span className="text-sky-400 font-bold">{(mandate.minRequiredYieldBps / 100)}% APY</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">DAILY SPEND LIMIT:</span>
-                <span className="text-purple-400 font-bold">${mandate.maxDailySpendUSD.toLocaleString()} USD</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">COUNTERPARTY REQUIREMENT:</span>
-                <span className="text-emerald-400 font-bold">Cleanverse CVI Required</span>
-              </div>
-            </div>
-
           </div>
 
-          {/* Quick Scenario Preset Buttons */}
-          <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-            <span className="text-[10px] font-mono text-slate-400 uppercase font-bold block">TEST SCENARIO PRESETS:</span>
-            <div className="flex flex-wrap gap-2">
+          {/* Scenario Presets */}
+          <div className="bg-slate-950/60 p-5 rounded-2xl border border-slate-800/80 space-y-3">
+            <span className="text-xs font-mono text-slate-400 uppercase font-bold block">TEST SCENARIO PRESETS:</span>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
               <button
                 type="button"
                 onClick={() => {
                   setSelectedPoolId("pool-1");
                   setRebalanceAmountUSD(15000);
                 }}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-semibold"
+                className="p-3 rounded-xl bg-emerald-950/40 hover:bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 text-left transition-all font-semibold"
               >
-                1. Monad Vault (CVI Passed - 12.8% APY)
+                <div className="text-[10px] text-emerald-400 font-bold">PRESET 1 (PASS)</div>
+                <div>Monad Vault</div>
+                <div className="text-[10px] opacity-75">12.8% APY | CVI Verified</div>
               </button>
+
               <button
                 type="button"
                 onClick={() => {
                   setSelectedPoolId("pool-4");
                   setRebalanceAmountUSD(20000);
                 }}
-                className="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-mono font-semibold"
+                className="p-3 rounded-xl bg-rose-950/40 hover:bg-rose-950/70 border border-rose-500/40 text-rose-300 text-left transition-all font-semibold"
               >
-                2. Shadow Unverified Pool (CVI Error 403 Rejection)
+                <div className="text-[10px] text-rose-400 font-bold">PRESET 2 (REVERT)</div>
+                <div>Shadow Pool</div>
+                <div className="text-[10px] opacity-75">Unverified | CVI Error 403</div>
               </button>
+
               <button
                 type="button"
                 onClick={() => {
                   setSelectedPoolId("pool-1");
-                  setRebalanceAmountUSD(35000); // Exceeds limit
+                  setRebalanceAmountUSD(35000);
                 }}
-                className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-mono font-semibold"
+                className="p-3 rounded-xl bg-amber-950/40 hover:bg-amber-950/70 border border-amber-500/40 text-amber-300 text-left transition-all font-semibold"
               >
-                3. Spend Limit Exceeded Violation
+                <div className="text-[10px] text-amber-400 font-bold">PRESET 3 (ABORT)</div>
+                <div>Spend Limit Exceeded</div>
+                <div className="text-[10px] opacity-75">$35,000 &gt; $25,000 Limit</div>
               </button>
             </div>
           </div>
 
         </div>
 
-        {/* Right: Live Evaluation Trace & Audit Result */}
-        <div className="glass-panel p-6 space-y-4 flex flex-col justify-between border-slate-700">
+        {/* Right: Live Evaluation Trace & Callout */}
+        <div className="glass-panel p-8 space-y-5 flex flex-col justify-between border-slate-700">
           <div>
-            <h3 className="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-800/80 pb-4">
               <Cpu className="w-5 h-5 text-purple-400" />
-              Real-Time Agent Evaluation Trace
+              Real-Time Protocol Evaluation Trace
             </h3>
 
-            <div className="mt-4 space-y-2 font-mono text-xs">
+            <div className="mt-4 space-y-3 font-mono text-xs">
               {evaluationSteps.length === 0 ? (
-                <div className="p-8 text-center text-slate-500 border border-dashed border-slate-800 rounded-xl">
-                  Click <span className="text-purple-400 font-bold">Run Autonomous Agent Cycle</span> to see the Cleanverse Agent Skill Framework evaluate mandate rules & counterparty CVI compliance in real-time.
+                <div className="p-8 text-center text-slate-500 border border-dashed border-slate-800 rounded-2xl leading-relaxed">
+                  Click <span className="text-purple-400 font-bold">Run Autonomous Agent Execution</span> to see the Cleanverse Agent Skill Framework evaluate mandate rules & counterparty CVI compliance in real-time.
                 </div>
               ) : (
                 evaluationSteps.map((s, idx) => (
-                  <div key={idx} className={`p-2.5 rounded-lg border flex items-center gap-2 ${
-                    s.status === 'pass' ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-300' :
-                    s.status === 'fail' ? 'bg-rose-950/40 border-rose-500/40 text-rose-300 font-bold' :
+                  <div key={idx} className={`p-3 rounded-xl border flex items-center gap-2.5 transition-all ${
+                    s.status === 'pass' ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' :
+                    s.status === 'fail' ? 'bg-rose-950/50 border-rose-500/50 text-rose-300 font-bold shadow-lg shadow-rose-950/50' :
                     'bg-slate-900 border-slate-800 text-slate-400'
                   }`}>
-                    {s.status === 'pass' && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
-                    {s.status === 'fail' && <AlertOctagon className="w-4 h-4 text-rose-400 shrink-0" />}
-                    {s.status === 'pending' && <span className="w-3 h-3 border-2 border-purple-400 border-t-transparent rounded-full animate-spin shrink-0"></span>}
+                    {s.status === 'pass' && <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400 shrink-0" />}
+                    {s.status === 'fail' && <AlertOctagon className="w-4.5 h-4.5 text-rose-400 shrink-0" />}
+                    {s.status === 'pending' && <span className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin shrink-0"></span>}
                     <span>{s.text}</span>
                   </div>
                 ))
@@ -237,12 +266,12 @@ export default function AgentControlPanel({
           </div>
 
           {executionResult && (
-            <div className={`p-4 rounded-xl border space-y-3 font-mono animate-in fade-in duration-300 ${
+            <div className={`p-5 rounded-2xl border space-y-3 font-mono animate-in fade-in duration-300 ${
               executionResult.blocked 
-                ? 'bg-rose-950/60 border-rose-500/80 text-rose-100 shadow-2xl shadow-rose-950/50' 
-                : 'bg-emerald-950/60 border-emerald-500/80 text-emerald-100 shadow-2xl shadow-emerald-950/50'
+                ? 'bg-rose-950/70 border-rose-500/80 text-rose-100 shadow-2xl shadow-rose-950/60' 
+                : 'bg-emerald-950/70 border-emerald-500/80 text-emerald-100 shadow-2xl shadow-emerald-950/60'
             }`}>
-              <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide">
+              <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wide">
                 {executionResult.blocked ? (
                   <>
                     <ShieldAlert className="w-5 h-5 text-rose-400 animate-bounce" />
@@ -251,7 +280,7 @@ export default function AgentControlPanel({
                 ) : (
                   <>
                     <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                    <span>AUTONOMOUS EXECUTION COMPLIANT!</span>
+                    <span>AUTONOMOUS EXECUTION APPROVED!</span>
                   </>
                 )}
               </div>
@@ -261,7 +290,7 @@ export default function AgentControlPanel({
               </p>
 
               {executionResult.auditRecord && (
-                <div className="pt-2 border-t border-white/10 text-[10px] space-y-1">
+                <div className="pt-3 border-t border-white/10 text-[10px] space-y-1">
                   <div className="flex justify-between">
                     <span className="opacity-70">MANDATE RECORD ID:</span>
                     <span className="font-bold">#{executionResult.auditRecord.recordId}</span>
