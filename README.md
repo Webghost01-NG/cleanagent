@@ -26,7 +26,7 @@ Traditional DeFi yield bots operate blindly, depositing funds into unverified, h
 ```
                           ┌────────────────────────────────┐
                           │    Next.js 16 App Router UI    │
-                          │ (Kwala Design System & Dark/Light)│
+                          │ (CleanAgent Dark/Light Theme)  │
                           └───────────────┬────────────────┘
                                           │
                   ┌───────────────────────┴───────────────────────┐
@@ -101,7 +101,7 @@ cleanagent/
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── page.js            # Main dApp layout & tab router
-│   │   │   ├── globals.css        # Kwala MCP theme tokens & dot grid
+│   │   │   ├── globals.css        # CleanAgent theme tokens & dot grid
 │   │   │   └── api/               # Serverless Next.js API Routes
 │   │   │       ├── stats/
 │   │   │       ├── pools/
@@ -169,4 +169,4 @@ Audit logger recording immutable cryptographic signatures (`0x8f3c...`) for inst
 Built with ❤️ by **Webghost01-NG** for the **Cleanverse Hackathon**.
 
 - **GitHub Repository**: [github.com/Webghost01-NG/cleanagent](https://github.com/Webghost01-NG/cleanagent)
-- **Live Local App**: `http://localhost:3000`
+- **Live Production URL**: [https://next-app-coral-zeta.vercel.app](https://next-app-coral-zeta.vercel.app)
