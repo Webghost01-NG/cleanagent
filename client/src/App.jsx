@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
+import KwalaNavbar from './components/KwalaNavbar';
 import KwalaHeroAndMasonry from './components/KwalaHeroAndMasonry';
+import KwalaAgentChat from './components/KwalaAgentChat';
 import AgentControlPanel from './components/AgentControlPanel';
 import CompliantPools from './components/CompliantPools';
 import AgentAuditExplorer from './components/AgentAuditExplorer';
 import DocsView from './components/DocsView';
 import WalletModal from './components/WalletModal';
 import { connectEVMWallet, connectPhantomWallet } from './services/web3';
-import { Bot } from 'lucide-react';
+import { Bot, ArrowRight, GitFork } from 'lucide-react';
 
 const API_BASE = 'http://localhost:5001/api';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('control'); // 'control' | 'pools' | 'audit' | 'docs'
-  const [currentWallet, setCurrentWallet] = useState('0x2546BcD3c84621e976D8185a91A922aE77ECEc30'); // Default Charlie
+  const [activeTab, setActiveTab] = useState('control'); // 'chat' | 'control' | 'pools' | 'audit' | 'docs'
+  const [currentWallet, setCurrentWallet] = useState('0x2546BcD3c84621e976D8185a91A922aE77ECEc30');
   const [selectedNetwork, setSelectedNetwork] = useState('monad');
   
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
@@ -124,36 +125,42 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white bg-[#060913]">
+    <div className="min-h-screen flex flex-col justify-between selection:bg-[#b87cf8] selection:text-[#0f0e17] bg-[#0f0e17] kwala-dot-grid text-[#f4f3fb]">
       
       {/* Top Floating Kwala-Style Navbar */}
-      <Navbar
-        currentWallet={currentWallet}
-        identities={identities}
-        onOpenWalletModal={() => setIsWalletModalOpen(true)}
+      <KwalaNavbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        selectedNetwork={selectedNetwork}
-        onSelectNetwork={setSelectedNetwork}
+        currentWallet={currentWallet}
+        onOpenWalletModal={() => setIsWalletModalOpen(true)}
+        identities={identities}
       />
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 lg:px-8 py-6 flex-1 w-full space-y-12">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-12">
         
         {/* Kwala Hero & Feature Masonry Banner */}
         <KwalaHeroAndMasonry
           onStartAgent={() => setActiveTab('control')}
-          onOpenDemo={() => setActiveTab('control')}
+          onOpenDemo={() => setActiveTab('chat')}
         />
 
         {/* Tab Views */}
         {loading ? (
-          <div className="glass-panel p-12 text-center text-slate-400 font-mono space-y-3">
-            <div className="w-8 h-8 border-4 border-purple-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p>Connecting to CleanAgent Protocol Server...</p>
+          <div className="kwala-card p-12 text-center text-[#9a98b0] font-mono space-y-3">
+            <div className="size-8 border-2 border-[#b87cf8] border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p>Connecting to CleanAgent Server...</p>
           </div>
         ) : (
           <>
+            {activeTab === 'chat' && (
+              <KwalaAgentChat
+                pools={pools}
+                mandate={mandate}
+                onRunAgentCycle={handleRunAgentCycle}
+              />
+            )}
+
             {activeTab === 'control' && (
               <AgentControlPanel
                 pools={pools}
@@ -197,19 +204,36 @@ export default function App() {
         identities={identities}
       />
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-[#060913]/95 backdrop-blur-md py-8 px-4 text-center text-xs font-mono text-slate-400 mt-12">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Bot className="w-4.5 h-4.5 text-purple-400" />
-            <span className="font-sans font-semibold text-slate-200">CleanAgent Protocol &copy; 2026 — Cleanverse Capability #8 Agent Skill Framework</span>
+      {/* kwala-mcp Footer */}
+      <footer className="w-full bg-[#0f0e17] border-t border-[#2a283c] mt-16">
+        <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col items-center sm:items-start gap-1">
+            <span className="font-mono text-xs font-bold text-[#f4f3fb] tracking-tight flex items-center gap-2">
+              <Bot className="size-4 text-[#b87cf8]" />
+              CleanAgent AI
+            </span>
+            <span className="font-mono text-[10px] text-[#9a98b0]">
+              AI-powered autonomous yield & CVI compliance engine
+            </span>
+            <span className="font-mono text-[10px] text-[#9a98b0]/60">
+              Cleanverse Capability #8 &middot; Track 02 (Compliant DeFi)
+            </span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px]">
-            <button onClick={() => setActiveTab('docs')} className="text-purple-400 hover:underline font-bold">Docs & Spec</button>
-            <span className="text-emerald-400">CVI Verified Identity</span>
-            <span className="text-sky-400">CVA Audit Provenance</span>
-          </div>
+          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-xs text-[#9a98b0]">
+            <button onClick={() => setActiveTab('chat')} className="hover:text-[#f4f3fb] transition-colors">Agent Chat</button>
+            <button onClick={() => setActiveTab('control')} className="hover:text-[#f4f3fb] transition-colors">Dashboard</button>
+            <button onClick={() => setActiveTab('pools')} className="hover:text-[#f4f3fb] transition-colors">Compliant Vaults</button>
+            <button onClick={() => setActiveTab('docs')} className="hover:text-[#f4f3fb] transition-colors">Docs</button>
+            <a
+              href="https://github.com/Webghost01-NG/cleanagent"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 hover:text-[#f4f3fb] transition-colors"
+            >
+              GitHub <GitFork className="size-3" />
+            </a>
+          </nav>
         </div>
       </footer>
 
