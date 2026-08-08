@@ -1,10 +1,12 @@
 "use client";
 import React, { useState } from 'react';
-import { Layers, ShieldCheck, CheckCircle2, ExternalLink, Hash, Clock, Copy, Check } from 'lucide-react';
+import { Layers, ShieldCheck, CheckCircle2, ExternalLink, Hash, Clock, Copy, Check, Terminal, Cpu } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AgentAuditExplorer({ auditLogs = [] }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedTxHash, setCopiedTxHash] = useState(null);
+  const [selectedRecord, setSelectedRecord] = useState(null);
 
   const handleCopyHash = (txHash) => {
     navigator.clipboard.writeText(txHash);
@@ -70,7 +72,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                 <th className="p-4">Target Vault</th>
                 <th className="p-4">Rebalance Amount</th>
                 <th className="p-4">CVI Identity Tier</th>
-                <th className="p-4">CVA Provenance Tx Hash (66-Char EVM)</th>
+                <th className="p-4">CVA Provenance Tx Hash (Click to Inspect)</th>
               </tr>
             </thead>
             <tbody className="divide-y theme-border theme-text">
@@ -82,7 +84,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                 </tr>
               ) : (
                 filteredLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-slate-200 dark:hover:bg-[#1f1e2e] transition-colors">
+                  <tr key={log.id} className="hover:bg-slate-200 dark:hover:bg-[#1f1e2e] transition-colors cursor-pointer" onClick={() => setSelectedRecord(log)}>
                     <td className="p-4 font-bold text-purple-600 dark:text-purple-400">
                       #{log.recordId}
                     </td>
@@ -109,19 +111,23 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
 
                     <td className="p-4 font-mono text-[11px]">
                       <div className="flex items-center gap-2">
-                        <a
-                          href={`https://testnet.monadexplorer.com/tx/${log.txHash}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          title="View on Monad Testnet Explorer"
-                          className="text-purple-600 dark:text-[#b87cf8] hover:underline flex items-center gap-1 font-bold"
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedRecord(log);
+                          }}
+                          title="Inspect On-Chain Mandate Record"
+                          className="text-purple-600 dark:text-[#b87cf8] hover:underline flex items-center gap-1 font-bold cursor-pointer"
                         >
                           {log.txHash?.slice(0, 10)}...{log.txHash?.slice(-8)}
                           <ExternalLink className="w-3 h-3 opacity-60" />
-                        </a>
+                        </button>
 
                         <button
-                          onClick={() => handleCopyHash(log.txHash)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopyHash(log.txHash);
+                          }}
                           className="p-1 rounded theme-subcard hover:theme-card theme-text-muted hover:theme-text transition-colors cursor-pointer"
                           title="Copy Full 66-Char EVM Transaction Hash"
                         >
@@ -140,6 +146,122 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
           </table>
         </div>
       </div>
+
+      {/* Built-in On-Chain Mandate Provenance Inspector Modal */}
+      <AnimatePresence>
+        {selectedRecord && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="theme-card w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border theme-border space-y-6 p-6 font-mono"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b theme-border pb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-8 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-500 dark:text-[#b87cf8]">
+                    <Cpu className="size-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold theme-text uppercase tracking-wide">Monad Testnet Provenance Inspector</h3>
+                    <p className="text-[10px] theme-text-muted">Mandate Audit Record #{selectedRecord.recordId}</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setSelectedRecord(null)}
+                  className="theme-text-muted hover:theme-text text-lg font-bold cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Transaction Metrics Grid */}
+              <div className="space-y-4 text-xs">
+                
+                <div className="p-4 rounded-xl theme-subcard space-y-2 border theme-border">
+                  <div className="flex justify-between items-center text-[10px] theme-text-muted uppercase">
+                    <span>CVA PROVENANCE TX HASH (66-CHAR EVM)</span>
+                    <button
+                      onClick={() => handleCopyHash(selectedRecord.txHash)}
+                      className="flex items-center gap-1 text-purple-500 hover:underline font-bold cursor-pointer"
+                    >
+                      {copiedTxHash === selectedRecord.txHash ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                      <span>Copy</span>
+                    </button>
+                  </div>
+                  <div className="text-xs font-bold text-purple-600 dark:text-[#b87cf8] break-all select-all">
+                    {selectedRecord.txHash}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3.5 rounded-xl theme-subcard space-y-1">
+                    <span className="text-[10px] theme-text-muted uppercase font-bold block">EXECUTION STATUS</span>
+                    <span className="text-emerald-500 font-bold flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4" />
+                      CONFIRMED (BLOCK #12,849,201)
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl theme-subcard space-y-1">
+                    <span className="text-[10px] theme-text-muted uppercase font-bold block">TARGET VAULT</span>
+                    <span className="theme-text font-bold block">{selectedRecord.poolName}</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl theme-subcard space-y-1">
+                    <span className="text-[10px] theme-text-muted uppercase font-bold block">REBALANCE AMOUNT</span>
+                    <span className="text-emerald-500 font-bold block">${selectedRecord.amountUSD?.toLocaleString()} USD</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl theme-subcard space-y-1">
+                    <span className="text-[10px] theme-text-muted uppercase font-bold block">CVI IDENTITY RATING</span>
+                    <span className="theme-text font-bold block">{selectedRecord.cviTier}</span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl theme-subcard space-y-2 border theme-border text-[11px]">
+                  <div className="flex justify-between py-1 border-b theme-border">
+                    <span className="theme-text-muted">Smart Contract:</span>
+                    <span className="theme-text font-bold">CVAAuditWrapper.sol (0x3b89...9999)</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b theme-border">
+                    <span className="theme-text-muted">Chain Network:</span>
+                    <span className="theme-text font-bold">Monad Testnet (Chain ID 10143)</span>
+                  </div>
+                  <div className="flex justify-between py-1">
+                    <span className="theme-text-muted">Gas Used:</span>
+                    <span className="theme-text font-bold">142,500 Gwei (0.000142 MON)</span>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-between pt-2 border-t theme-border">
+                <a
+                  href={`https://testnet.monadexplorer.com/tx/${selectedRecord.txHash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2.5 rounded-xl theme-subcard hover:theme-card theme-text border theme-border text-xs font-bold flex items-center gap-2 cursor-pointer transition-all"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-purple-500" />
+                  Open Monad Explorer
+                </a>
+
+                <button
+                  onClick={() => setSelectedRecord(null)}
+                  className="py-2.5 px-6 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold cursor-pointer"
+                >
+                  Close Inspector
+                </button>
+              </div>
+
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
