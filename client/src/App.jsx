@@ -4,6 +4,7 @@ import KwalaHeroAndMasonry from './components/KwalaHeroAndMasonry';
 import AgentControlPanel from './components/AgentControlPanel';
 import CompliantPools from './components/CompliantPools';
 import AgentAuditExplorer from './components/AgentAuditExplorer';
+import DocsView from './components/DocsView';
 import WalletModal from './components/WalletModal';
 import { connectEVMWallet, connectPhantomWallet } from './services/web3';
 import { Bot } from 'lucide-react';
@@ -11,7 +12,7 @@ import { Bot } from 'lucide-react';
 const API_BASE = 'http://localhost:5001/api';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('control'); // 'control' | 'pools' | 'audit'
+  const [activeTab, setActiveTab] = useState('control'); // 'control' | 'pools' | 'audit' | 'docs'
   const [currentWallet, setCurrentWallet] = useState('0x2546BcD3c84621e976D8185a91A922aE77ECEc30'); // Default Charlie
   const [selectedNetwork, setSelectedNetwork] = useState('monad');
   
@@ -177,6 +178,10 @@ export default function App() {
                 auditLogs={auditLogs}
               />
             )}
+
+            {activeTab === 'docs' && (
+              <DocsView />
+            )}
           </>
         )}
 
@@ -201,6 +206,7 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
+            <button onClick={() => setActiveTab('docs')} className="text-purple-400 hover:underline font-bold">Docs & Spec</button>
             <span className="text-emerald-400">CVI Verified Identity</span>
             <span className="text-sky-400">CVA Audit Provenance</span>
           </div>
