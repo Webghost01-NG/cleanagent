@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, ShieldAlert, ShieldCheck, Cpu, Sliders, Zap, Activity, Terminal, Check, AlertCircle } from 'lucide-react';
 
 export default function AgentControlPanel({ 
-  pools, 
-  mandate, 
+  pools = [], 
+  mandate = {}, 
   onRunAgentCycle, 
   onUpdateMandate,
   currentWallet,
@@ -49,6 +49,10 @@ export default function AgentControlPanel({
     if (!currentWallet) {
       onOpenWalletModal();
       return;
+    }
+
+    if (targetPoolId) {
+      setSelectedPoolId(targetPoolId);
     }
 
     const targetPool = pools.find(p => p.id === targetPoolId) || currentPool;
