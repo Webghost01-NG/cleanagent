@@ -1,137 +1,144 @@
-import React from 'react';
-import { Bot, ShieldCheck, Cpu, Layers, Wallet, ChevronDown, Sparkles, BookOpen } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sun, Moon, GitFork, Menu, X, Wallet, ChevronDown } from 'lucide-react';
 
 export default function Navbar({ 
-  currentWallet, 
-  identities, 
-  onOpenWalletModal, 
   activeTab, 
-  setActiveTab,
-  selectedNetwork,
-  onSelectNetwork
+  setActiveTab, 
+  currentWallet, 
+  onOpenWalletModal,
+  isDarkMode,
+  onToggleTheme 
 }) {
-  const currentIdentity = identities.find(i => i.wallet === currentWallet) || {
-    wallet: currentWallet,
-    name: "Connected Wallet",
-    role: "Unverified Wallet",
-    isVerified: false,
-    isAccredited: false
-  };
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const GITHUB_URL = "https://github.com/Webghost01-NG/cleanagent";
 
   const shortAddress = currentWallet ? `${currentWallet.slice(0, 6)}...${currentWallet.slice(-4)}` : "Not Connected";
 
-  return (
-    <header className="sticky top-0 z-50 backdrop-blur-2xl bg-[#060913]/90 border-b border-slate-800/80 px-4 lg:px-8 py-3">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        
-        {/* Brand Logo */}
-        <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
-          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveTab('control')}>
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-500 via-indigo-500 to-emerald-400 p-0.5 shadow-xl shadow-purple-500/20 group-hover:scale-105 transition-transform">
-              <div className="w-full h-full bg-[#090d16] rounded-[14px] flex items-center justify-center">
-                <Bot className="w-5 h-5 text-purple-400" />
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-black tracking-tight text-white font-sans">CleanAgent</h1>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/30 font-bold flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-purple-400" />
-                  CAPABILITY #8
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 flex items-center gap-1 font-mono">
-                Compliant DeFi: <span className="text-emerald-400 font-semibold">Agent Skill Framework</span>
-              </p>
-            </div>
-          </div>
+  const navLinks = [
+    { id: "chat", label: "Chat" },
+    { id: "control", label: "Dashboard" },
+    { id: "pools", label: "Vaults" },
+    { id: "audit", label: "Audit" },
+    { id: "docs", label: "Docs" },
+  ];
 
-          {/* Network Switcher */}
-          <div className="hidden lg:flex items-center gap-2">
-            <select
-              value={selectedNetwork}
-              onChange={(e) => onSelectNetwork(e.target.value)}
-              className="bg-slate-900/90 border border-slate-700/80 text-slate-200 text-xs font-mono rounded-xl px-3 py-2 focus:outline-none focus:border-purple-500 cursor-pointer shadow-inner font-bold"
-            >
-              <option value="monad">⚡ Monad Testnet</option>
-              <option value="cleanverse">🌐 Cleanverse EVM</option>
-              <option value="base">🔵 Base Mainnet</option>
-              <option value="arbitrum">💙 Arbitrum One</option>
-            </select>
+  return (
+    <header className="sticky top-0 z-50 w-full theme-border border-b theme-card backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+        
+        {/* Left: Brand Wordmark */}
+        <div 
+          className="flex items-center gap-2.5 sm:gap-3 cursor-pointer hover:opacity-80 transition-opacity shrink-0"
+          onClick={() => setActiveTab('control')}
+        >
+          <div className="size-8 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center">
+            <span className="text-purple-500 dark:text-[#b87cf8] font-black text-sm font-mono">C</span>
           </div>
+          <span className="font-mono text-sm sm:text-base font-bold tracking-[0.12em] theme-text">
+            CleanAgent AI
+          </span>
         </div>
 
-        {/* Navigation Tabs */}
-        <nav className="flex items-center gap-1 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800/80 text-xs font-semibold w-full md:w-auto shadow-inner">
-          
+        {/* Desktop Nav Links */}
+        <nav className="hidden md:flex items-center gap-1 font-sans text-xs font-medium">
+          {navLinks.map((link) => (
+            <button
+              key={link.id}
+              onClick={() => setActiveTab(link.id)}
+              className={`px-3.5 py-2 rounded-lg transition-all cursor-pointer ${
+                activeTab === link.id
+                  ? 'nav-tab-active'
+                  : 'theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e]'
+              }`}
+            >
+              {link.label}
+            </button>
+          ))}
+
+          {/* Theme Toggle Button */}
           <button
-            onClick={() => setActiveTab('control')}
-            className={`px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 flex-1 md:flex-none justify-center ${
-              activeTab === 'control'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/30 font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-            }`}
+            onClick={onToggleTheme}
+            className="ml-1 p-2 theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e] rounded-lg transition-colors cursor-pointer"
+            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
-            <Cpu className="w-4 h-4 text-purple-300" />
-            Dashboard
+            {isDarkMode ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4 text-purple-600" />}
           </button>
 
-          <button
-            onClick={() => setActiveTab('pools')}
-            className={`px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 flex-1 md:flex-none justify-center ${
-              activeTab === 'pools'
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/30 font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-            }`}
+          {/* GitHub Repo Icon */}
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e] transition-colors rounded-lg"
+            title="GitHub Repository"
           >
-            <ShieldCheck className="w-4 h-4 text-emerald-300" />
-            Compliant Vaults
-          </button>
+            <GitFork className="size-4" />
+          </a>
 
-          <button
-            onClick={() => setActiveTab('audit')}
-            className={`px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 flex-1 md:flex-none justify-center ${
-              activeTab === 'audit'
-                ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-lg shadow-sky-500/30 font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-            }`}
-          >
-            <Layers className="w-4 h-4 text-sky-300" />
-            Audit Ledger
-          </button>
-
-          <button
-            onClick={() => setActiveTab('docs')}
-            className={`px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 flex-1 md:flex-none justify-center ${
-              activeTab === 'docs'
-                ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg shadow-amber-500/30 font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-            }`}
-          >
-            <BookOpen className="w-4 h-4 text-amber-300" />
-            Docs & Spec
-          </button>
-
-        </nav>
-
-        {/* Connect Wallet Button */}
-        <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
+          {/* Web3 Wallet Button */}
           <button
             onClick={onOpenWalletModal}
-            className="btn-primary flex items-center gap-2 text-xs py-2 px-3.5 shadow-xl"
+            className="ml-1 flex items-center gap-2 px-3 py-1.5 rounded-lg theme-subcard text-xs font-mono theme-text transition-all hover:border-purple-500 cursor-pointer"
           >
-            <Wallet className="w-4 h-4" />
-            <div className="text-left font-mono">
-              <span className="block font-bold text-white leading-tight">{shortAddress}</span>
-              <span className="block text-[9px] text-purple-200">
-                {currentIdentity.isVerified ? (currentIdentity.isAccredited ? 'CVI Accredited' : 'CVI Standard') : 'Unverified Wallet'}
-              </span>
-            </div>
-            <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+            <Wallet className="size-3.5 text-purple-500 dark:text-[#b87cf8]" />
+            <span>{shortAddress}</span>
+            <ChevronDown className="size-3 opacity-60" />
+          </button>
+
+          {/* Get Started Pill Button */}
+          <button
+            onClick={() => setActiveTab('control')}
+            className="ml-2 inline-flex items-center rounded-full theme-border border theme-card px-4 py-1.5 font-mono text-[11px] tracking-[0.12em] font-semibold uppercase theme-text transition-all hover:bg-purple-600 hover:text-white cursor-pointer"
+          >
+            Get Started
+          </button>
+        </nav>
+
+        {/* Mobile Menu Trigger */}
+        <div className="flex md:hidden items-center gap-1.5">
+          <button
+            onClick={onToggleTheme}
+            className="p-2 theme-text-muted hover:theme-text rounded-lg"
+          >
+            {isDarkMode ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4 text-purple-600" />}
+          </button>
+
+          <button
+            onClick={onOpenWalletModal}
+            className="px-2.5 py-1.5 rounded-lg theme-subcard text-xs font-mono theme-text"
+          >
+            {shortAddress}
+          </button>
+
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="p-2 theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e] rounded-lg"
+          >
+            {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
         </div>
 
       </div>
+
+      {/* Mobile Dropdown */}
+      {mobileOpen && (
+        <div className="md:hidden theme-border border-b theme-card px-4 py-4 space-y-2 font-mono text-xs">
+          {navLinks.map((link) => (
+            <button
+              key={link.id}
+              onClick={() => {
+                setActiveTab(link.id);
+                setMobileOpen(false);
+              }}
+              className={`w-full text-left px-3 py-2 rounded-lg ${
+                activeTab === link.id ? 'nav-tab-active' : 'theme-text-muted'
+              }`}
+            >
+              {link.label}
+            </button>
+          ))}
+        </div>
+      )}
     </header>
   );
 }

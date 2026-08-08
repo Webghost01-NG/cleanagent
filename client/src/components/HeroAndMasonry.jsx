@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Bot, ShieldCheck, Layers, Zap, Sparkles, CheckCircle2, Terminal } from 'lucide-react';
 
-export default function KwalaHeroAndMasonry({ onStartAgent, onOpenDemo }) {
+export default function HeroAndMasonry({ onStartAgent, onOpenDemo }) {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -74,7 +74,7 @@ export default function KwalaHeroAndMasonry({ onStartAgent, onOpenDemo }) {
         </motion.div>
       </div>
 
-      {/* Kwala-Style Masonry Capability Grid */}
+      {/* Masonry Capability Grid */}
       <motion.div 
         variants={containerVariants}
         initial="hidden"

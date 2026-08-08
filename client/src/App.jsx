@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import KwalaNavbar from './components/KwalaNavbar';
-import KwalaHeroAndMasonry from './components/KwalaHeroAndMasonry';
-import KwalaAgentChat from './components/KwalaAgentChat';
+import Navbar from './components/Navbar';
+import HeroAndMasonry from './components/HeroAndMasonry';
+import AgentChat from './components/AgentChat';
 import AgentControlPanel from './components/AgentControlPanel';
 import CompliantPools from './components/CompliantPools';
 import AgentAuditExplorer from './components/AgentAuditExplorer';
@@ -134,10 +134,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between selection:bg-[#b87cf8] selection:text-[#0f0e17] bg-background kwala-dot-grid text-foreground">
+    <div className="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white bg-background agent-dot-grid text-foreground">
       
-      {/* Top Floating Kwala-Style Navbar */}
-      <KwalaNavbar
+      {/* Top Floating Navbar */}
+      <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         currentWallet={currentWallet}
@@ -152,15 +152,15 @@ export default function App() {
         
         {/* Tab Views - Immediate rendering upon tab click */}
         {loading ? (
-          <div className="kwala-card p-12 text-center text-muted-foreground font-mono space-y-3">
-            <div className="size-8 border-2 border-[#b87cf8] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="agent-card p-12 text-center theme-text-muted font-mono space-y-3">
+            <div className="size-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
             <p>Connecting to CleanAgent Server...</p>
           </div>
         ) : (
           <>
             {activeTab === 'control' && (
               <div className="space-y-12 animate-in fade-in duration-200">
-                <KwalaHeroAndMasonry
+                <HeroAndMasonry
                   onStartAgent={() => setActiveTab('control')}
                   onOpenDemo={() => setActiveTab('chat')}
                 />
@@ -177,7 +177,7 @@ export default function App() {
 
             {activeTab === 'chat' && (
               <div className="animate-in fade-in duration-200">
-                <KwalaAgentChat
+                <AgentChat
                   pools={pools}
                   mandate={mandate}
                   onRunAgentCycle={handleRunAgentCycle}
@@ -223,32 +223,29 @@ export default function App() {
         identities={identities}
       />
 
-      {/* kwala-mcp Footer */}
-      <footer className="w-full bg-background border-t border-border mt-16">
+      {/* Footer */}
+      <footer className="w-full bg-background border-t theme-border mt-16">
         <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center sm:items-start gap-1">
-            <span className="font-mono text-xs font-bold text-foreground tracking-tight flex items-center gap-2">
-              <Bot className="size-4 text-[#b87cf8]" />
+            <span className="font-mono text-xs font-bold theme-text tracking-tight flex items-center gap-2">
+              <Bot className="size-4 text-purple-500" />
               CleanAgent AI
             </span>
-            <span className="font-mono text-[10px] text-muted-foreground">
+            <span className="font-mono text-[10px] theme-text-muted">
               AI-powered autonomous yield & CVI compliance engine
-            </span>
-            <span className="font-mono text-[10px] text-muted-foreground/60">
-              Cleanverse Capability #8 &middot; Track 02 (Compliant DeFi)
             </span>
           </div>
 
-          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-xs text-muted-foreground">
-            <button onClick={() => setActiveTab('chat')} className="hover:text-foreground transition-colors">Chat</button>
-            <button onClick={() => setActiveTab('control')} className="hover:text-foreground transition-colors">Dashboard</button>
-            <button onClick={() => setActiveTab('pools')} className="hover:text-foreground transition-colors">Vaults</button>
-            <button onClick={() => setActiveTab('docs')} className="hover:text-foreground transition-colors">Docs</button>
+          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-xs theme-text-muted">
+            <button onClick={() => setActiveTab('chat')} className="hover:theme-text transition-colors cursor-pointer">Chat</button>
+            <button onClick={() => setActiveTab('control')} className="hover:theme-text transition-colors cursor-pointer">Dashboard</button>
+            <button onClick={() => setActiveTab('pools')} className="hover:theme-text transition-colors cursor-pointer">Vaults</button>
+            <button onClick={() => setActiveTab('docs')} className="hover:theme-text transition-colors cursor-pointer">Docs</button>
             <a
               href="https://github.com/Webghost01-NG/cleanagent"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 hover:text-foreground transition-colors"
+              className="flex items-center gap-1.5 hover:theme-text transition-colors"
             >
               GitHub <GitFork className="size-3" />
             </a>
