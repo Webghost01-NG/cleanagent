@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
+import KwalaHeroAndMasonry from './components/KwalaHeroAndMasonry';
 import AgentControlPanel from './components/AgentControlPanel';
 import CompliantPools from './components/CompliantPools';
 import AgentAuditExplorer from './components/AgentAuditExplorer';
 import WalletModal from './components/WalletModal';
 import SummaryModal from './components/SummaryModal';
 import { connectEVMWallet, connectPhantomWallet } from './services/web3';
-import { ShieldCheck, Bot, Cpu } from 'lucide-react';
+import { Bot } from 'lucide-react';
 
 const API_BASE = 'http://localhost:5001/api';
 
@@ -116,9 +117,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+    <div className="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white bg-[#060913]">
       
-      {/* Top Navbar */}
+      {/* Top Floating Kwala-Style Navbar */}
       <Navbar
         currentWallet={currentWallet}
         identities={identities}
@@ -131,8 +132,14 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8 flex-1 w-full">
+      <main className="max-w-7xl mx-auto px-4 lg:px-8 py-6 flex-1 w-full space-y-12">
         
+        {/* Kwala Hero & Feature Masonry Banner */}
+        <KwalaHeroAndMasonry
+          onStartAgent={() => setActiveTab('control')}
+          onOpenDemo={() => setActiveTab('control')}
+        />
+
         {/* Tab Views */}
         {loading ? (
           <div className="glass-panel p-12 text-center text-slate-400 font-mono space-y-3">
@@ -185,11 +192,11 @@ export default function App() {
       />
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-[#090d16]/90 backdrop-blur-md py-6 px-4 text-center text-xs font-mono text-slate-400">
+      <footer className="border-t border-slate-800/80 bg-[#060913]/95 backdrop-blur-md py-8 px-4 text-center text-xs font-mono text-slate-400 mt-12">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Bot className="w-4 h-4 text-purple-400" />
-            <span>CleanAgent Protocol &copy; 2026 — Cleanverse Capability #8 Agent Skill Framework</span>
+            <Bot className="w-4.5 h-4.5 text-purple-400" />
+            <span className="font-sans font-semibold text-slate-200">CleanAgent Protocol &copy; 2026 — Cleanverse Capability #8 Agent Skill Framework</span>
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
