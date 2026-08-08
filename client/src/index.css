@@ -2,45 +2,77 @@
 
 @layer base {
   :root {
-    --background: #f8f7fc;
-    --foreground: #0f0e17;
-    --card: #ffffff;
-    --card-foreground: #0f0e17;
-    --primary: #9333ea;
-    --primary-foreground: #ffffff;
-    --secondary: #f1f0f7;
-    --secondary-foreground: #0f0e17;
-    --muted: #f1f0f7;
-    --muted-foreground: #64748b;
-    --border: #e2e8f0;
-    --ring: #9333ea;
+    --bg-main: #fafafa;
+    --bg-card: #ffffff;
+    --bg-subcard: #f3f4f6;
+    --text-primary: #111827;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+    --primary-accent: #9333ea;
   }
 
   .dark {
-    --background: #0f0e17;
-    --foreground: #f4f3fb;
-    --card: #181724;
-    --card-foreground: #f4f3fb;
-    --primary: #b87cf8;
-    --primary-foreground: #0f0e17;
-    --secondary: #1f1e2e;
-    --secondary-foreground: #f4f3fb;
-    --muted: #1f1e2e;
-    --muted-foreground: #9a98b0;
-    --border: #2a283c;
-    --ring: #b87cf8;
+    --bg-main: #0f0e17;
+    --bg-card: #181724;
+    --bg-subcard: #1f1e2e;
+    --text-primary: #f4f3fb;
+    --text-muted: #9a98b0;
+    --border-color: #2a283c;
+    --primary-accent: #b87cf8;
   }
 
   body {
-    background-color: var(--background);
-    color: var(--foreground);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     overflow-x: hidden;
     transition: background-color 0.25s ease, color 0.25s ease;
   }
+
+  /* Force all standard elements to inherit theme text color unless explicitly highlighted */
+  h1, h2, h3, h4, h5, h6, p, span, div, label, input, select, textarea, button {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  }
 }
 
-/* kwala-mcp Grid Dot Background */
+/* Theme Adaptive Utility Classes */
+.theme-bg {
+  background-color: var(--bg-main) !important;
+}
+
+.theme-card {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-subcard {
+  background-color: var(--bg-subcard) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-text {
+  color: var(--text-primary) !important;
+}
+
+.theme-text-muted {
+  color: var(--text-muted) !important;
+}
+
+.theme-border {
+  border-color: var(--border-color) !important;
+}
+
+/* Kwala Active Tab styling */
+.nav-tab-active {
+  background-color: var(--primary-accent) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(147, 51, 234, 0.35) !important;
+}
+
+/* Kwala Grid Dot Background */
 .dark .kwala-dot-grid {
   background-image: radial-gradient(circle, rgba(184, 124, 248, 0.08) 1px, transparent 1px);
   background-size: 28px 28px;
@@ -51,27 +83,6 @@
   background-size: 28px 28px;
 }
 
-/* kwala-mcp Card Styling */
-.kwala-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.kwala-card:hover {
-  border-color: var(--primary);
-  box-shadow: 0 10px 30px rgba(184, 124, 248, 0.12);
-}
-
-/* Kwala Active Tab styling */
-.nav-tab-active {
-  background-color: #b87cf8 !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  box-shadow: 0 4px 14px rgba(184, 124, 248, 0.35) !important;
-}
-
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -79,14 +90,10 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: var(--bg-main);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: var(--border-color);
   border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
 }
