@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, ShieldCheck, Cpu, Layers, Code, Terminal, FileCode, CheckCircle2, Copy, Check, ExternalLink, Zap } from 'lucide-react';
+import { BookOpen, ShieldCheck, Cpu, Layers, Terminal, FileCode, Copy, Check, ExternalLink, Zap, HelpCircle } from 'lucide-react';
 
 export default function DocsView() {
   const [activeSection, setActiveSection] = useState('overview');
@@ -15,7 +15,7 @@ export default function DocsView() {
   -H "Content-Type: application/json" \\
   -d '{"targetPoolId": "pool-1", "amountUSD": 15000}'`;
 
-  const sampleSolidity = `// CleanAgentVault.sol - Cleanverse Capability #8 Enforcer
+  const sampleSolidity = `// CleanAgentVault.sol - Compliant DeFi Execution Engine
 function executeRebalanceMandate(address targetPool, uint256 amountUSD) external nonReentrant {
     require(amountUSD <= mandate.maxSpendPerTxUSD, "Mandate: Spend limit exceeded");
     require(cviRegistry.isVerified(targetPool), "CVI Error 403: Unverified pool counterparty");
@@ -29,18 +29,18 @@ function executeRebalanceMandate(address targetPool, uint256 amountUSD) external
     <div className="space-y-8 pt-2">
       
       {/* Docs Header Banner */}
-      <div className="glass-panel p-8 relative overflow-hidden border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-[#0d1326] to-indigo-950/40 shadow-2xl">
+      <div className="theme-card p-8 relative overflow-hidden shadow-2xl">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="px-3.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 font-mono text-xs font-bold uppercase flex items-center gap-1.5">
-                <BookOpen className="w-4 h-4 text-purple-400" />
-                DEVELOPER SPECIFICATION & DOCUMENTATION
+              <span className="px-3.5 py-1 rounded-full theme-subcard font-mono text-xs font-bold uppercase flex items-center gap-1.5 theme-text">
+                <BookOpen className="w-4 h-4 text-purple-500" />
+                DEVELOPER SPECIFICATION & USER GUIDE
               </span>
             </div>
-            <h2 className="text-3xl font-black text-white font-sans">CleanAgent Protocol Documentation</h2>
-            <p className="text-sm text-slate-300 max-w-2xl">
-              Complete technical specification for CleanAgent Protocol — Track 02 (Compliant DeFi) leveraging **Cleanverse Capability #8 (Agent Skill Framework)**.
+            <h2 className="text-3xl font-black theme-text font-sans">CleanAgent Protocol Documentation</h2>
+            <p className="text-sm theme-text-muted max-w-2xl">
+              Everything you need to know about CleanAgent Protocol — how it works, how to run mandates, and how CVA audit logging operates.
             </p>
           </div>
 
@@ -49,9 +49,9 @@ function executeRebalanceMandate(address targetPool, uint256 amountUSD) external
               href="https://github.com/Webghost01-NG/cleanagent"
               target="_blank"
               rel="noreferrer"
-              className="py-3 px-5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-mono font-bold flex items-center gap-2 transition-all"
+              className="py-3 px-5 rounded-xl theme-subcard theme-text theme-border border text-xs font-mono font-bold flex items-center gap-2 transition-all hover:border-purple-500"
             >
-              <ExternalLink className="w-4 h-4 text-purple-400" />
+              <ExternalLink className="w-4 h-4 text-purple-500" />
               GitHub Repository
             </a>
           </div>
@@ -62,198 +62,190 @@ function executeRebalanceMandate(address targetPool, uint256 amountUSD) external
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         
         {/* Left Sidebar Navigation */}
-        <div className="glass-panel p-4 space-y-2 font-mono text-xs h-fit">
-          <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold px-3 py-1 block">TABLE OF CONTENTS</span>
+        <div className="theme-card p-4 space-y-2 font-mono text-xs h-fit">
+          <span className="text-[10px] theme-text-muted uppercase tracking-widest font-bold px-3 py-1 block">TABLE OF CONTENTS</span>
 
           <button
             onClick={() => setActiveSection('overview')}
-            className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 font-bold ${
-              activeSection === 'overview' ? 'bg-purple-600/30 text-purple-300 border border-purple-500/40' : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 font-bold cursor-pointer ${
+              activeSection === 'overview' ? 'nav-tab-active' : 'theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e]'
             }`}
           >
             <Cpu className="w-4 h-4" />
-            1. Protocol Overview
+            1. What is CleanAgent?
+          </button>
+
+          <button
+            onClick={() => setActiveSection('guide')}
+            className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 font-bold cursor-pointer ${
+              activeSection === 'guide' ? 'nav-tab-active' : 'theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e]'
+            }`}
+          >
+            <HelpCircle className="w-4 h-4" />
+            2. Step-by-Step User Guide
+          </button>
+
+          <button
+            onClick={() => setActiveSection('audit-explanation')}
+            className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 font-bold cursor-pointer ${
+              activeSection === 'audit-explanation' ? 'nav-tab-active' : 'theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e]'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            3. What is the Audit Ledger For?
           </button>
 
           <button
             onClick={() => setActiveSection('contracts')}
-            className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 font-bold ${
-              activeSection === 'contracts' ? 'bg-purple-600/30 text-purple-300 border border-purple-500/40' : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 font-bold cursor-pointer ${
+              activeSection === 'contracts' ? 'nav-tab-active' : 'theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e]'
             }`}
           >
             <FileCode className="w-4 h-4" />
-            2. Smart Contracts (CVI & CVA)
-          </button>
-
-          <button
-            onClick={() => setActiveSection('api')}
-            className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 font-bold ${
-              activeSection === 'api' ? 'bg-purple-600/30 text-purple-300 border border-purple-500/40' : 'text-slate-400 hover:text-white hover:bg-slate-900'
-            }`}
-          >
-            <Terminal className="w-4 h-4" />
-            3. REST Telemetry API
-          </button>
-
-          <button
-            onClick={() => setActiveSection('judging')}
-            className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 font-bold ${
-              activeSection === 'judging' ? 'bg-purple-600/30 text-purple-300 border border-purple-500/40' : 'text-slate-400 hover:text-white hover:bg-slate-900'
-            }`}
-          >
-            <ShieldCheck className="w-4 h-4" />
-            4. Hackathon Judging Matrix
+            4. Smart Contracts & API
           </button>
         </div>
 
         {/* Right Content Area */}
-        <div className="lg:col-span-3 glass-panel p-8 space-y-8">
+        <div className="lg:col-span-3 theme-card p-8 space-y-8">
           
-          {/* Section 1: Overview */}
+          {/* Section 1: What is CleanAgent? */}
           {activeSection === 'overview' && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="border-b border-slate-800 pb-4">
-                <h3 className="text-2xl font-bold text-white">1. Executive Protocol Overview</h3>
-                <p className="text-xs font-mono text-purple-400 mt-1">Track 02 — Compliant DeFi | Cleanverse Capability #8</p>
+              <div className="border-b theme-border pb-4">
+                <h3 className="text-2xl font-bold theme-text">1. What is CleanAgent Protocol?</h3>
+                <p className="text-xs font-mono text-purple-500 mt-1">Autonomous Compliant DeFi & Yield Platform</p>
               </div>
 
-              <div className="space-y-4 text-sm text-slate-300 leading-relaxed font-sans">
+              <div className="space-y-4 text-sm theme-text leading-relaxed font-sans">
                 <p>
-                  **CleanAgent Protocol** solves the core compliance risk of automated Web3 yield farming. Traditional AI agents run blindly without checking regulatory or counterparty compliance, risking user capital in unverified or sanctioned liquidity pools.
+                  **CleanAgent Protocol** is an autonomous yield management system designed to eliminate regulatory & compliance risks in DeFi trading. Standard yield bots operate blindly, putting user funds into unverified, high-risk, or non-compliant liquidity pools.
                 </p>
                 <p>
-                  Built directly on **Cleanverse Capability #8 (Agent Skill Framework)**, CleanAgent enforces programmable spend mandates ($25,000/tx max), target APY yield thresholds, and queries **Cleanverse Verified Identity (CVI)** attestation contracts on-chain before executing any trade.
+                  CleanAgent solves this by combining **programmable execution mandates** with **Cleanverse Verified Identity (CVI)** and **Cleanverse Verified Assets (CVA)** on-chain guardrails.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
-                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                  <span className="text-purple-400 font-bold block mb-1">Capability #8 Engine</span>
-                  <span className="text-slate-400">Programmable Mandates & Spend Limits</span>
+                <div className="theme-subcard p-4 rounded-xl">
+                  <span className="text-purple-500 font-bold block mb-1">Programmable Mandates</span>
+                  <span className="theme-text-muted">Enforce per-transaction spend limits & APY targets</span>
                 </div>
-                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                  <span className="text-emerald-400 font-bold block mb-1">CVI Identity Guardrail</span>
-                  <span className="text-slate-400">On-Chain Pool KYC/AML Verification</span>
+                <div className="theme-subcard p-4 rounded-xl">
+                  <span className="text-emerald-500 font-bold block mb-1">CVI Identity Verification</span>
+                  <span className="theme-text-muted">Checks counterparty KYC/AML status before trade</span>
                 </div>
-                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                  <span className="text-sky-400 font-bold block mb-1">CVA Provenance Ledger</span>
-                  <span className="text-slate-400">Immutable Mandate Audit Trails</span>
+                <div className="theme-subcard p-4 rounded-xl">
+                  <span className="text-sky-500 font-bold block mb-1">CVA Audit Provenance</span>
+                  <span className="theme-text-muted">Immutable cryptographic record of every trade</span>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Section 2: Contracts */}
+          {/* Section 2: User Guide */}
+          {activeSection === 'guide' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="border-b theme-border pb-4">
+                <h3 className="text-2xl font-bold theme-text">2. How to Use CleanAgent (Step-by-Step)</h3>
+                <p className="text-xs font-mono text-emerald-500 mt-1">Simple 4-Step Protocol Workflow</p>
+              </div>
+
+              <div className="space-y-4 font-mono text-xs">
+                <div className="p-4 theme-subcard rounded-xl space-y-1">
+                  <span className="text-purple-500 font-bold block">Step 1: Connect Web3 Wallet</span>
+                  <p className="theme-text-muted font-sans text-xs">Click "Connect" in the top right to link your MetaMask or Phantom wallet. dApp access is gated to authenticated wallets.</p>
+                </div>
+
+                <div className="p-4 theme-subcard rounded-xl space-y-1">
+                  <span className="text-purple-500 font-bold block">Step 2: Configure Mandate Guardrails</span>
+                  <p className="theme-text-muted font-sans text-xs">Set your **Max Spend Per Tx** limit ($5k - $100k) and **Min APY Target** (1% - 25%). Click "Save Guardrails On-Chain".</p>
+                </div>
+
+                <div className="p-4 theme-subcard rounded-xl space-y-1">
+                  <span className="text-purple-500 font-bold block">Step 3: Run Execution Cycle</span>
+                  <p className="theme-text-muted font-sans text-xs">Click **RUN AGENT EXECUTION CYCLE**. The persistent terminal modal opens, displaying live streaming checks on spend limits, yield thresholds, and CVI clearance.</p>
+                </div>
+
+                <div className="p-4 theme-subcard rounded-xl space-y-1">
+                  <span className="text-purple-500 font-bold block">Step 4: Inspect Audit Provenance</span>
+                  <p className="theme-text-muted font-sans text-xs">Navigate to **Audit Ledger** to view the cryptographic mandate hash and on-chain record for your transaction.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Section 3: Audit Ledger Explanation */}
+          {activeSection === 'audit-explanation' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="border-b theme-border pb-4">
+                <h3 className="text-2xl font-bold theme-text">3. What is the Audit Ledger For?</h3>
+                <p className="text-xs font-mono text-sky-500 mt-1">Cleanverse Verified Assets (CVA) Provenance Engine</p>
+              </div>
+
+              <div className="space-y-4 text-sm theme-text leading-relaxed font-sans">
+                <p>
+                  The **Audit Ledger** is an immutable, on-chain compliance journal powered by `CVAAuditWrapper.sol`.
+                </p>
+                <p>
+                  Every time CleanAgent executes a yield deposit or blocks a non-compliant pool, a **CVA Audit Record** is generated containing:
+                </p>
+
+                <ul className="list-disc pl-6 space-y-2 font-mono text-xs theme-text">
+                  <li><strong>Record ID & Block Number</strong>: Chronological transaction sequence on Monad Testnet.</li>
+                  <li><strong>Cryptographic Provenance Hash</strong> (`0x8f3c...`): SHA-256 digital signature of the mandate execution.</li>
+                  <li><strong>Mandate Rules Evaluated</strong>: Spend limit pass/fail status and APY floor check.</li>
+                  <li><strong>CVI Counterparty Attestation</strong>: Verified KYC tier of the destination pool.</li>
+                </ul>
+
+                <p className="pt-2">
+                  **Why it matters**: Institutional investors, DAOs, and auditors can independently verify that every automated trade strictly adhered to compliance guardrails without trusting off-chain servers.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Section 4: Smart Contracts & API */}
           {activeSection === 'contracts' && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="border-b border-slate-800 pb-4">
-                <h3 className="text-2xl font-bold text-white">2. Smart Contracts Architecture</h3>
-                <p className="text-xs font-mono text-emerald-400 mt-1">Deployed on Monad Protocol Testnet & Cleanverse EVM</p>
+              <div className="border-b theme-border pb-4">
+                <h3 className="text-2xl font-bold theme-text">4. Smart Contracts & REST API Reference</h3>
+                <p className="text-xs font-mono text-amber-500 mt-1">Developer Integration Specifications</p>
               </div>
 
               <div className="space-y-4">
-                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                <div className="theme-subcard p-4 rounded-xl space-y-2">
                   <div className="flex items-center justify-between font-mono text-xs">
-                    <span className="text-purple-400 font-bold">CleanAgentVault.sol</span>
-                    <span className="text-slate-500">Contract Address: 0x7a83...4e91</span>
+                    <span className="text-purple-500 font-bold">CleanAgentVault.sol</span>
+                    <span className="theme-text-muted">Contract Address: 0x7a83...4e91</span>
                   </div>
-                  <p className="text-xs text-slate-300">Enforces daily spend caps, APY yield floors, and counterparty CVI verification before rebalancing.</p>
+                  <p className="text-xs theme-text-muted">Core mandate execution engine enforcing spend limits and calling CVI counterparty checks.</p>
                 </div>
 
-                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                <div className="theme-subcard p-4 rounded-xl space-y-2">
                   <div className="flex items-center justify-between font-mono text-xs">
-                    <span className="text-emerald-400 font-bold">CVIIdentityRegistry.sol</span>
-                    <span className="text-slate-500">Contract Address: 0x3b89...11c2</span>
+                    <span className="text-emerald-500 font-bold">CVIIdentityRegistry.sol</span>
+                    <span className="theme-text-muted">Contract Address: 0x3b89...11c2</span>
                   </div>
-                  <p className="text-xs text-slate-300">On-chain attestation registry storing KYC tiers (`Tier 1 Accredited`, `Standard Verified`, `Unverified`).</p>
+                  <p className="text-xs theme-text-muted">On-chain attestation registry storing pool verification status (`isVerified`).</p>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono text-slate-400 font-bold">Solidity Implementation Snippet:</span>
+                  <span className="text-xs font-mono theme-text-muted font-bold">Solidity Core Method:</span>
                   <button
                     onClick={() => handleCopyCode(sampleSolidity)}
-                    className="text-xs font-mono text-purple-400 hover:underline flex items-center gap-1"
+                    className="text-xs font-mono text-purple-500 hover:underline flex items-center gap-1 cursor-pointer"
                   >
-                    {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                     {copiedCode ? 'Copied!' : 'Copy Code'}
                   </button>
                 </div>
 
-                <pre className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs font-mono text-purple-300 overflow-x-auto">
+                <pre className="theme-subcard p-4 rounded-xl text-xs font-mono text-purple-500 dark:text-[#b87cf8] overflow-x-auto">
                   {sampleSolidity}
                 </pre>
-              </div>
-            </div>
-          )}
-
-          {/* Section 3: REST API */}
-          {activeSection === 'api' && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="border-b border-slate-800 pb-4">
-                <h3 className="text-2xl font-bold text-white">3. Express REST Telemetry API Reference</h3>
-                <p className="text-xs font-mono text-sky-400 mt-1">Backend Endpoint: http://localhost:5001/api</p>
-              </div>
-
-              <div className="space-y-3 font-mono text-xs">
-                <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
-                  <span className="text-emerald-400 font-bold">POST /api/agent/run</span>
-                  <span className="text-slate-400">Triggers autonomous mandate evaluation cycle</span>
-                </div>
-
-                <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
-                  <span className="text-purple-400 font-bold">GET /api/pools</span>
-                  <span className="text-slate-400">Fetches live target pool APY & CVI status</span>
-                </div>
-
-                <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
-                  <span className="text-sky-400 font-bold">GET /api/cva/audit-trail</span>
-                  <span className="text-slate-400">Fetches immutable CVA mandate provenance logs</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <span className="text-xs font-mono text-slate-400 font-bold">Sample cURL Command:</span>
-                <pre className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs font-mono text-slate-200 overflow-x-auto">
-                  {sampleCurl}
-                </pre>
-              </div>
-            </div>
-          )}
-
-          {/* Section 4: Judging Matrix */}
-          {activeSection === 'judging' && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="border-b border-slate-800 pb-4">
-                <h3 className="text-2xl font-bold text-white">4. Hackathon Judging Matrix Alignment</h3>
-                <p className="text-xs font-mono text-amber-400 mt-1">Scored against official Cleanverse Judging Criteria</p>
-              </div>
-
-              <div className="space-y-4 font-mono text-xs">
-                <div className="p-4 bg-slate-950 rounded-xl border border-purple-500/30 space-y-1">
-                  <div className="flex justify-between font-bold">
-                    <span className="text-purple-300">1. Depth of CVI·CVA Integration (30 Pts)</span>
-                    <span className="text-emerald-400">30 / 30</span>
-                  </div>
-                  <p className="text-slate-400 font-sans text-xs">Integrates CVI identity checks before trade execution & logs CVA mandate provenance hashes on-chain.</p>
-                </div>
-
-                <div className="p-4 bg-slate-950 rounded-xl border border-purple-500/30 space-y-1">
-                  <div className="flex justify-between font-bold">
-                    <span className="text-purple-300">2. Build Quality & Code Architecture (25 Pts)</span>
-                    <span className="text-emerald-400">25 / 25</span>
-                  </div>
-                  <p className="text-slate-400 font-sans text-xs">Clean Solidity contracts, Hardhat test suite, Express backend, and React 19 dApp with 10 Git commits.</p>
-                </div>
-
-                <div className="p-4 bg-slate-950 rounded-xl border border-purple-500/30 space-y-1">
-                  <div className="flex justify-between font-bold">
-                    <span className="text-purple-300">3. Concept & Problem Definition (20 Pts)</span>
-                    <span className="text-emerald-400">20 / 20</span>
-                  </div>
-                  <p className="text-slate-400 font-sans text-xs">Solves compliance risk in AI yield farming by mandating counterparty CVI verification.</p>
-                </div>
               </div>
             </div>
           )}

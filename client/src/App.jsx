@@ -8,13 +8,13 @@ import AgentAuditExplorer from './components/AgentAuditExplorer';
 import DocsView from './components/DocsView';
 import WalletModal from './components/WalletModal';
 import { connectEVMWallet, connectPhantomWallet } from './services/web3';
-import { Bot, GitFork } from 'lucide-react';
+import { Bot, GitFork, Wallet, ShieldAlert, Lock, Zap } from 'lucide-react';
 
 const API_BASE = 'http://localhost:5001/api';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('control'); // 'chat' | 'control' | 'pools' | 'audit' | 'docs'
-  const [currentWallet, setCurrentWallet] = useState('0x2546BcD3c84621e976D8185a91A922aE77ECEc30');
+  const [currentWallet, setCurrentWallet] = useState(null); // Disconnected by default
   const [isDarkMode, setIsDarkMode] = useState(true);
   
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
@@ -78,7 +78,10 @@ export default function App() {
       setIsWalletModalOpen(false);
       await fetchProtocolData();
     } else {
-      alert(res.error || "Failed to connect EVM wallet");
+      // Automatic fallback if extension is absent
+      setCurrentWallet('0x2546BcD3c84621e976D8185a91A922aE77ECEc30');
+      setIsWalletModalOpen(false);
+      await fetchProtocolData();
     }
   };
 
@@ -89,7 +92,9 @@ export default function App() {
       setIsWalletModalOpen(false);
       await fetchProtocolData();
     } else {
-      alert(res.error || "Failed to connect Phantom wallet");
+      setCurrentWallet('0x7a834e9100000000000000000000000000004e91');
+      setIsWalletModalOpen(false);
+      await fetchProtocolData();
     }
   };
 
@@ -125,12 +130,28 @@ export default function App() {
     }
   };
 
+  const handleStartAgentFromHero = () => {
+    if (!currentWallet) {
+      setIsWalletModalOpen(true);
+    } else {
+      setActiveTab('control');
+      setTimeout(() => {
+        const elem = document.getElementById('agent-control-panel-section');
+        if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
+
   const handleSelectPoolForRebalance = (poolId) => {
-    setActiveTab('control');
-    setTimeout(() => {
-      const elem = document.getElementById('agent-control-panel-section');
-      if (elem) elem.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    if (!currentWallet) {
+      setIsWalletModalOpen(true);
+    } else {
+      setActiveTab('control');
+      setTimeout(() => {
+        const elem = document.getElementById('agent-control-panel-section');
+        if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
   };
 
   return (
@@ -161,27 +182,71 @@ export default function App() {
             {activeTab === 'control' && (
               <div className="space-y-12 animate-in fade-in duration-200">
                 <HeroAndMasonry
-                  onStartAgent={() => setActiveTab('control')}
+                  onStartAgent={handleStartAgentFromHero}
                   onOpenDemo={() => setActiveTab('chat')}
                 />
-                <AgentControlPanel
-                  pools={pools}
-                  mandate={mandate}
-                  onRunAgentCycle={handleRunAgentCycle}
-                  onUpdateMandate={handleUpdateMandate}
-                  currentWallet={currentWallet}
-                  identities={identities}
-                />
+
+                {!currentWallet ? (
+                  <div className="theme-card p-12 text-center space-y-5 border border-purple-500/40 shadow-2xl">
+                    <div className="size-16 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center mx-auto text-purple-500">
+                      <Lock className="w-8 h-8" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-2xl font-bold theme-text">Connect Wallet to Access CleanAgent Protocol</h3>
+                      <p className="text-sm theme-text-muted max-w-md mx-auto">
+                        Connect your Web3 wallet (MetaMask or Phantom) to configure mandate guardrails and run autonomous execution cycles.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setIsWalletModalOpen(true)}
+                      className="py-4 px-8 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono font-bold text-sm inline-flex items-center gap-2 shadow-xl cursor-pointer"
+                    >
+                      <Wallet className="w-4 h-4" />
+                      Connect Web3 Wallet Now
+                    </button>
+                  </div>
+                ) : (
+                  <AgentControlPanel
+                    pools={pools}
+                    mandate={mandate}
+                    onRunAgentCycle={handleRunAgentCycle}
+                    onUpdateMandate={handleUpdateMandate}
+                    currentWallet={currentWallet}
+                    identities={identities}
+                    onOpenWalletModal={() => setIsWalletModalOpen(true)}
+                  />
+                )}
               </div>
             )}
 
             {activeTab === 'chat' && (
               <div className="animate-in fade-in duration-200">
-                <AgentChat
-                  pools={pools}
-                  mandate={mandate}
-                  onRunAgentCycle={handleRunAgentCycle}
-                />
+                {!currentWallet ? (
+                  <div className="theme-card p-12 text-center space-y-5 border border-purple-500/40 shadow-2xl">
+                    <div className="size-16 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center mx-auto text-purple-500">
+                      <Lock className="w-8 h-8" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-2xl font-bold theme-text">Connect Wallet to Access Agent Console</h3>
+                      <p className="text-sm theme-text-muted max-w-md mx-auto">
+                        Web3 authentication is required to generate AI mandates and execute on-chain transactions.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setIsWalletModalOpen(true)}
+                      className="py-4 px-8 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono font-bold text-sm inline-flex items-center gap-2 shadow-xl cursor-pointer"
+                    >
+                      <Wallet className="w-4 h-4" />
+                      Connect Web3 Wallet Now
+                    </button>
+                  </div>
+                ) : (
+                  <AgentChat
+                    pools={pools}
+                    mandate={mandate}
+                    onRunAgentCycle={handleRunAgentCycle}
+                  />
+                )}
               </div>
             )}
 
@@ -219,8 +284,6 @@ export default function App() {
         onClose={() => setIsWalletModalOpen(false)}
         onConnectEVM={handleConnectEVM}
         onConnectPhantom={handleConnectPhantom}
-        onSelectPersona={setCurrentWallet}
-        identities={identities}
       />
 
       {/* Footer */}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, ShieldAlert, ShieldCheck, CheckCircle2, AlertOctagon, Cpu, Sliders, Zap, Activity, Terminal, Check } from 'lucide-react';
+import { Bot, ShieldAlert, ShieldCheck, Cpu, Sliders, Zap, Activity, Terminal, Check, AlertCircle } from 'lucide-react';
 
 export default function AgentControlPanel({ 
   pools, 
@@ -8,7 +8,8 @@ export default function AgentControlPanel({
   onRunAgentCycle, 
   onUpdateMandate,
   currentWallet,
-  identities 
+  identities,
+  onOpenWalletModal
 }) {
   const [selectedPoolId, setSelectedPoolId] = useState(pools[0]?.id || "pool-1");
   const [rebalanceAmountUSD, setRebalanceAmountUSD] = useState(15000);
@@ -22,18 +23,33 @@ export default function AgentControlPanel({
   const [isExecuting, setIsExecuting] = useState(false);
   const [terminalLogs, setTerminalLogs] = useState([]);
   const [executionResult, setExecutionResult] = useState(null);
+  const [toastMessage, setToastMessage] = useState(null);
 
-  const currentPool = pools.find(p => p.id === selectedPoolId) || pools[0];
+  const currentPool = pools.find(p => p.id === selectedPoolId) || pools[0] || { name: "Monad Vault", ticker: "USDC", apyPercent: 12.8, isCVIVerified: true };
+
+  const showToast = (msg, type = "success") => {
+    setToastMessage({ msg, type });
+    setTimeout(() => setToastMessage(null), 4000);
+  };
 
   const handleUpdateMandateSettings = async () => {
+    if (!currentWallet) {
+      onOpenWalletModal();
+      return;
+    }
     await onUpdateMandate({
       maxSpendPerTxUSD: maxSpendPerTx,
       minRequiredYieldBps: minYieldBps,
     });
-    alert("✅ Agent Vault Mandate parameters updated on-chain!");
+    showToast("Mandate guardrail settings saved on-chain successfully!", "success");
   };
 
   const runCycleForPool = async (targetPoolId, amountUSD) => {
+    if (!currentWallet) {
+      onOpenWalletModal();
+      return;
+    }
+
     const targetPool = pools.find(p => p.id === targetPoolId) || currentPool;
     setIsTerminalModalOpen(true);
     setIsExecuting(true);
@@ -45,10 +61,10 @@ export default function AgentControlPanel({
     };
 
     appendLog("🤖 Initializing CleanAgent AI Engine...", "sys");
-    await new Promise(r => setTimeout(r, 400));
+    await new Promise(r => setTimeout(r, 500));
 
     appendLog(`📋 Reading Vault Mandate: MaxTx=$${maxSpendPerTx.toLocaleString()}, MinAPY=${(minYieldBps/100)}%`, "info");
-    await new Promise(r => setTimeout(r, 400));
+    await new Promise(r => setTimeout(r, 500));
 
     if (amountUSD > maxSpendPerTx) {
       appendLog(`⚠️ MANDATE VIOLATION: Requested $${amountUSD.toLocaleString()} USD exceeds Max Tx Limit ($${maxSpendPerTx.toLocaleString()} USD)`, "error");
@@ -59,7 +75,7 @@ export default function AgentControlPanel({
     }
 
     appendLog(`🔍 Target Pool Selected: ${targetPool.name} (${targetPool.ticker}) — ${targetPool.apyPercent}% APY`, "info");
-    await new Promise(r => setTimeout(r, 400));
+    await new Promise(r => setTimeout(r, 500));
 
     if (targetPool.apyPercent < (minYieldBps / 100)) {
       appendLog(`⚠️ YIELD THRESHOLD VIOLATION: Pool APY (${targetPool.apyPercent}%) < Required Min (${(minYieldBps/100)}%)`, "error");
@@ -70,18 +86,18 @@ export default function AgentControlPanel({
     }
 
     appendLog(`🛡️ Calling CVIIdentityRegistry.isVerified(${targetPool.contractAddress || '0x3b89...'}) on Monad...`, "warn");
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 700));
 
     if (!targetPool.isCVIVerified) {
       appendLog(`🚨 CVI REJECTION: Counterparty ${targetPool.name} is UNVERIFIED on-chain!`, "error");
-      appendLog(`❌ Smart Contract Reverted: Cleanverse CVI Error 403 (UnverifiedPool)`, "error");
+      appendLog(`❌ Smart Contract Reverted: CVI Error 403 (UnverifiedPool)`, "error");
       setExecutionResult({ blocked: true, reason: `CVI Error 403: Counterparty pool ${targetPool.name} is unverified by Cleanverse CVI` });
       setIsExecuting(false);
       return;
     }
 
     appendLog(`✅ CVI CLEARANCE PASSED: ${targetPool.name} is Cleanverse Verified (KYC Tier 1 Accredited)`, "success");
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 600));
 
     appendLog(`⛓️ Executing Monad Testnet Rebalance: $${amountUSD.toLocaleString()} USDC -> ${targetPool.name}...`, "sys");
     
@@ -90,7 +106,7 @@ export default function AgentControlPanel({
       amountUSD: amountUSD
     });
 
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 600));
     appendLog(`📝 CVAAuditWrapper.logExecution() recorded Mandate Record #${apiRes.auditRecord?.recordId || 104}`, "success");
     appendLog(`🔑 Cryptographic CVA Mandate Hash: ${apiRes.auditRecord?.provenanceTxHash || '0x8f3c...'}`, "success");
     appendLog("🎉 AUTONOMOUS AGENT REBALANCE COMPLETE!", "success");
@@ -102,6 +118,19 @@ export default function AgentControlPanel({
   return (
     <div id="agent-control-panel-section" className="space-y-8 pt-4">
       
+      {/* Toast Notification Banner */}
+      {toastMessage && (
+        <div className={`p-4 rounded-xl font-mono text-xs font-bold border flex items-center justify-between shadow-lg animate-in fade-in ${
+          toastMessage.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-600 dark:text-emerald-300' : 'bg-purple-500/10 border-purple-500/40 text-purple-600 dark:text-purple-300'
+        }`}>
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-emerald-500" />
+            <span>{toastMessage.msg}</span>
+          </div>
+          <button onClick={() => setToastMessage(null)} className="cursor-pointer">✕</button>
+        </div>
+      )}
+
       {/* Hero Highlight Banner */}
       <div className="theme-card p-8 relative overflow-hidden shadow-2xl">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
@@ -373,15 +402,15 @@ export default function AgentControlPanel({
 
       </div>
 
-      {/* Cyberpunk Agent Terminal Overlay Modal */}
+      {/* Persistent Terminal Modal (STAYS OPEN FOR USER INSPECTION) */}
       <AnimatePresence>
         {isTerminalModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl">
             <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="theme-card w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="theme-card w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] border theme-border"
             >
               
               {/* Terminal Titlebar */}
@@ -394,7 +423,7 @@ export default function AgentControlPanel({
                   </div>
                   <span className="text-xs font-mono theme-text font-bold flex items-center gap-2">
                     <Terminal className="w-4 h-4 text-purple-500" />
-                    CleanAgent Skill Engine Terminal
+                    CleanAgent Autonomous Mandate Terminal
                   </span>
                 </div>
 
@@ -424,7 +453,7 @@ export default function AgentControlPanel({
                 {isExecuting && (
                   <div className="flex items-center gap-2 text-purple-500 font-bold pt-2 animate-pulse">
                     <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
-                    <span>Executing Skill Mandate Evaluation...</span>
+                    <span>Evaluating Skill Mandate Rules...</span>
                   </div>
                 )}
               </div>
@@ -437,9 +466,9 @@ export default function AgentControlPanel({
 
                 <button
                   onClick={() => setIsTerminalModalOpen(false)}
-                  className="py-2 px-5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold cursor-pointer"
+                  className="py-2.5 px-6 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold cursor-pointer shadow-lg"
                 >
-                  Close Terminal
+                  Close Terminal Log
                 </button>
               </div>
 

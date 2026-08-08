@@ -1,119 +1,77 @@
 import React from 'react';
-import { Wallet, ShieldCheck, CheckCircle2, AlertCircle, X } from 'lucide-react';
+import { Wallet, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export default function WalletModal({ 
   isOpen, 
   onClose, 
   onConnectEVM, 
-  onConnectPhantom, 
-  onSelectPersona, 
-  identities 
+  onConnectPhantom 
 }) {
   if (!isOpen) return null;
 
-  const handleEVMClick = async () => {
-    try {
-      await onConnectEVM();
-    } catch (err) {
-      // Fallback to primary test persona if browser extension not detected
-      onSelectPersona('0x2546BcD3c84621e976D8185a91A922aE77ECEc30');
-      onClose();
-    }
-  };
-
-  const handlePhantomClick = async () => {
-    try {
-      await onConnectPhantom();
-    } catch (err) {
-      onSelectPersona('0x7a834e9100000000000000000000000000004e91');
-      onClose();
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="kwala-card w-full max-w-md p-6 space-y-5 bg-card text-card-foreground border-border shadow-2xl relative">
+      <div className="theme-card w-full max-w-md p-6 space-y-5 shadow-2xl relative border theme-border">
         
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border pb-3">
+        <div className="flex items-center justify-between border-b theme-border pb-3">
           <div className="flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-[#b87cf8]" />
-            <h3 className="text-lg font-bold text-foreground">Connect Web3 Wallet</h3>
+            <Wallet className="w-5 h-5 text-purple-500" />
+            <h3 className="text-lg font-bold theme-text">Connect Web3 Wallet</h3>
           </div>
           <button 
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground text-lg font-mono p-1"
+            className="theme-text-muted hover:theme-text text-lg font-mono p-1 cursor-pointer"
           >
             ✕
           </button>
         </div>
 
-        <p className="text-xs text-muted-foreground">
-          Connect your Web3 browser wallet or select a demo persona to inspect your **Cleanverse Verified Identity (CVI)** attestation status.
+        <p className="text-xs theme-text-muted leading-relaxed">
+          Connect your Web3 browser wallet to inspect on-chain CVI identity credentials, manage yield mandates, and execute autonomous trades.
         </p>
 
         {/* Real Wallet Buttons */}
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           
           {/* MetaMask / Injected EVM */}
           <button
-            onClick={handleEVMClick}
-            className="w-full p-3.5 rounded-xl bg-secondary hover:bg-muted border border-border flex items-center justify-between text-left transition-all cursor-pointer group"
+            onClick={async () => {
+              await onConnectEVM();
+              onClose();
+            }}
+            className="w-full p-4 rounded-xl theme-subcard hover:border-purple-500 border theme-border flex items-center justify-between text-left transition-all cursor-pointer group"
           >
             <div className="flex items-center gap-3">
               <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" className="w-7 h-7" />
               <div>
-                <span className="text-sm font-bold text-foreground group-hover:text-[#b87cf8] transition-colors block">MetaMask / EVM</span>
-                <span className="text-[10px] text-muted-foreground font-mono">Ethereum, Base, Monad, Polygon</span>
+                <span className="text-sm font-bold theme-text group-hover:text-purple-500 transition-colors block">MetaMask / Browser EVM</span>
+                <span className="text-[10px] theme-text-muted font-mono">Ethereum, Monad, Base, Arbitrum</span>
               </div>
             </div>
-            <span className="text-xs font-mono text-[#b87cf8] font-bold">Connect &rsaquo;</span>
+            <ArrowRight className="w-4 h-4 text-purple-500 group-hover:translate-x-1 transition-transform" />
           </button>
 
           {/* Phantom Wallet */}
           <button
-            onClick={handlePhantomClick}
-            className="w-full p-3.5 rounded-xl bg-secondary hover:bg-muted border border-border flex items-center justify-between text-left transition-all cursor-pointer group"
+            onClick={async () => {
+              await onConnectPhantom();
+              onClose();
+            }}
+            className="w-full p-4 rounded-xl theme-subcard hover:border-purple-500 border theme-border flex items-center justify-between text-left transition-all cursor-pointer group"
           >
             <div className="flex items-center gap-3">
               <div className="w-7 h-7 rounded-lg bg-purple-600 flex items-center justify-center text-white font-bold text-xs">
                 👻
               </div>
               <div>
-                <span className="text-sm font-bold text-foreground group-hover:text-purple-400 transition-colors block">Phantom Wallet</span>
-                <span className="text-[10px] text-muted-foreground font-mono">Solana & Multi-Chain EVM</span>
+                <span className="text-sm font-bold theme-text group-hover:text-purple-400 transition-colors block">Phantom Wallet</span>
+                <span className="text-[10px] theme-text-muted font-mono">Solana & Multi-Chain EVM</span>
               </div>
             </div>
-            <span className="text-xs font-mono text-purple-400 font-bold">Connect &rsaquo;</span>
+            <ArrowRight className="w-4 h-4 text-purple-500 group-hover:translate-x-1 transition-transform" />
           </button>
 
-        </div>
-
-        {/* Demo Personas Quick Select */}
-        <div className="pt-3 border-t border-border space-y-2">
-          <span className="text-[10px] font-mono text-muted-foreground uppercase font-bold block">
-            DEMO TEST PERSONAS (1-CLICK CONNECT):
-          </span>
-          <div className="space-y-1.5">
-            {identities.map((id) => (
-              <button
-                key={id.wallet}
-                onClick={() => {
-                  onSelectPersona(id.wallet);
-                  onClose();
-                }}
-                className="w-full p-2.5 rounded-lg bg-secondary/80 hover:bg-muted border border-border flex items-center justify-between text-xs font-mono text-left cursor-pointer transition-colors"
-              >
-                <div>
-                  <span className="text-foreground font-bold block">{id.name}</span>
-                  <span className="text-[10px] text-muted-foreground">{id.wallet.slice(0, 10)}...</span>
-                </div>
-                <span className={id.isVerified ? (id.isAccredited ? 'text-[#b87cf8] font-bold' : 'text-emerald-500 font-bold') : 'text-rose-500 font-bold'}>
-                  {id.isVerified ? (id.isAccredited ? 'CVI Accredited' : 'CVI Standard') : 'Unverified'}
-                </span>
-              </button>
-            ))}
-          </div>
         </div>
 
       </div>
