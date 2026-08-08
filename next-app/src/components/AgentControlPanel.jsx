@@ -160,10 +160,14 @@ export default function AgentControlPanel({
             <button
               onClick={() => runCycleForPool(selectedPoolId, rebalanceAmountUSD)}
               disabled={isExecuting}
-              className="py-5 px-8 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-base flex items-center justify-center gap-3 shadow-2xl shadow-purple-500/40 uppercase tracking-wider font-mono hover:scale-105 transition-all cursor-pointer"
+              title="Trigger Real-Time On-Chain Mandate & CVI Evaluation Cycle"
+              className="py-5 px-8 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-base flex flex-col items-center justify-center gap-1 shadow-2xl shadow-purple-500/40 uppercase tracking-wider font-mono hover:scale-105 transition-all cursor-pointer"
             >
-              <Zap className="w-6 h-6 text-amber-300 fill-amber-300" />
-              RUN AGENT EXECUTION CYCLE
+              <div className="flex items-center gap-3">
+                <Zap className="w-6 h-6 text-amber-300 fill-amber-300" />
+                <span>RUN AGENT EXECUTION CYCLE</span>
+              </div>
+              <span className="text-[10px] font-normal normal-case opacity-90">Evaluates Mandates, Queries CVI Identity, & Logs CVA Hashes On-Chain</span>
             </button>
           </div>
         </div>

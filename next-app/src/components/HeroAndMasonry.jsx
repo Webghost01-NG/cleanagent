@@ -50,18 +50,26 @@ export default function HeroAndMasonry({ onStartAgent, onOpenDemo }) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <button
               onClick={onStartAgent}
-              className="py-4 px-8 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-extrabold flex items-center gap-2.5 shadow-2xl shadow-purple-500/30 uppercase tracking-wider font-mono hover:scale-105 transition-transform cursor-pointer"
+              title="Connect Wallet & Open Agent Mandate Control Panel"
+              className="py-4 px-8 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-extrabold flex flex-col items-center gap-1 shadow-2xl shadow-purple-500/30 uppercase tracking-wider font-mono hover:scale-105 transition-transform cursor-pointer"
             >
-              <Zap className="w-5 h-5 text-amber-300 fill-amber-300" />
-              START AGENT PROJECT
+              <div className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-amber-300 fill-amber-300" />
+                START AGENT PROJECT
+              </div>
+              <span className="text-[9px] font-normal normal-case opacity-90">Open Mandate Control Panel & Configure Guardrails</span>
             </button>
 
             <button
               onClick={onOpenDemo}
-              className="py-4 px-8 rounded-xl theme-subcard theme-text theme-border border text-sm font-mono font-bold flex items-center gap-2 transition-all hover:scale-105 cursor-pointer"
+              title="Open Natural Language AI Agent Console"
+              className="py-4 px-8 rounded-xl theme-subcard theme-text theme-border border text-sm font-mono font-bold flex flex-col items-center gap-1 transition-all hover:scale-105 cursor-pointer"
             >
-              <Terminal className="w-4 h-4 text-purple-500 dark:text-[#b87cf8]" />
-              LAUNCH AGENT CHAT
+              <div className="flex items-center gap-2">
+                <Terminal className="w-4 h-4 text-purple-500 dark:text-[#b87cf8]" />
+                LAUNCH AGENT CHAT
+              </div>
+              <span className="text-[9px] theme-text-muted font-normal normal-case">Chat in Natural Language to Generate Mandates</span>
             </button>
           </div>
 
