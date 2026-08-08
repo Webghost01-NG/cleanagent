@@ -17,6 +17,16 @@ export default function HeroAndMasonry({ onStartAgent, onOpenDemo }) {
     visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: "easeOut" } }
   };
 
+  const chainsList = [
+    'Monad Testnet', 
+    'Ethereum Mainnet', 
+    'Base Mainnet', 
+    'Arbitrum One', 
+    'BNB Chain', 
+    'Polygon', 
+    'HashKey'
+  ];
+
   return (
     <div className="space-y-16 py-4">
       
@@ -146,17 +156,29 @@ export default function HeroAndMasonry({ onStartAgent, onOpenDemo }) {
         </div>
       </motion.div>
 
-      {/* Orbiting Multi-Chain Banner */}
-      <div className="theme-card p-8 text-center space-y-4">
-        <span className="text-xs font-mono theme-text-muted uppercase tracking-widest font-bold block">
+      {/* Infinite Moving Multi-Chain Marquee Banner */}
+      <div className="theme-card p-6 overflow-hidden space-y-4 rounded-3xl relative shadow-xl">
+        <span className="text-xs font-mono theme-text-muted uppercase tracking-widest font-extrabold block text-center">
           USE CLEANAGENT TO BUILD ON ANY EVM CHAIN
         </span>
-        <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-          {['Monad Testnet', 'Ethereum Mainnet', 'Base Mainnet', 'Arbitrum One', 'BNB Chain', 'Polygon', 'HashKey'].map((chain, idx) => (
-            <span key={idx} className="px-4 py-2 rounded-xl theme-subcard text-xs font-mono theme-text font-semibold shadow-sm hover:border-purple-500 transition-colors">
-              ⚡ {chain}
-            </span>
-          ))}
+
+        {/* Continuous Marquee Track */}
+        <div className="relative overflow-hidden w-full py-2">
+          {/* Gradient Edge Blurs */}
+          <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[var(--bg-card)] to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[var(--bg-card)] to-transparent z-10 pointer-events-none"></div>
+
+          <div className="animate-marquee flex items-center gap-4">
+            {[...chainsList, ...chainsList, ...chainsList].map((chain, idx) => (
+              <span 
+                key={idx} 
+                className="px-5 py-2.5 rounded-xl theme-subcard text-xs font-mono theme-text font-bold shadow-md hover:border-purple-500 hover:scale-105 transition-all shrink-0 flex items-center gap-2 cursor-pointer"
+              >
+                <span className="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                ⚡ {chain}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
