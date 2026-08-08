@@ -1,20 +1,41 @@
 "use client";
+
 import React, { useState } from 'react';
-import { BookOpen, ShieldCheck, Cpu, Layers, Terminal, FileCode, Copy, Check, ExternalLink, Zap, HelpCircle } from 'lucide-react';
+import { BookOpen, ShieldCheck, Cpu, Layers, Terminal, FileCode, Copy, Check, ExternalLink, Download, Code } from 'lucide-react';
 
 export default function DocsView() {
-  const [activeSection, setActiveSection] = useState('overview');
-  const [copiedCode, setCopiedCode] = useState(false);
+  const [activeSection, setActiveSection] = useState('installation');
+  const [copiedIndex, setCopiedIndex] = useState(null);
 
-  const handleCopyCode = (code) => {
+  const handleCopyCode = (code, index) => {
     navigator.clipboard.writeText(code);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  const sampleCurl = `curl -X POST http://localhost:5001/api/agent/run \\
-  -H "Content-Type: application/json" \\
-  -d '{"targetPoolId": "pool-1", "amountUSD": 15000}'`;
+  const npmInstallCode = `npm install @cleanagent/sdk`;
+  const cliInitCode = `npx cleanagent init --chain monad-testnet`;
+  
+  const jsSdkSnippet = `import { CleanAgent } from '@cleanagent/sdk';
+
+// Initialize CleanAgent Engine
+const agent = new CleanAgent({
+  network: 'monad-testnet',
+  vaultAddress: '0x7a834e9100000000000000000000000000004e91',
+  mandateGuardrails: {
+    maxSpendPerTxUSD: 25000,
+    minRequiredYieldBps: 700,
+    requireCVIVerified: true
+  }
+});
+
+// Run Autonomous Yield Cycle
+const result = await agent.runYieldCycle({
+  targetPool: 'Monad Vault',
+  amountUSD: 15000
+});
+
+console.log('CVA Mandate Provenance Hash:', result.auditRecord.provenanceTxHash);`;
 
   const sampleSolidity = `// CleanAgentVault.sol - Compliant DeFi Execution Engine
 function executeRebalanceMandate(address targetPool, uint256 amountUSD) external nonReentrant {
@@ -36,12 +57,12 @@ function executeRebalanceMandate(address targetPool, uint256 amountUSD) external
             <div className="flex items-center gap-2">
               <span className="px-3.5 py-1 rounded-full theme-subcard font-mono text-xs font-bold uppercase flex items-center gap-1.5 theme-text">
                 <BookOpen className="w-4 h-4 text-purple-500" />
-                DEVELOPER SPECIFICATION & USER GUIDE
+                DEVELOPER SDK & CLI INSTALLATION GUIDE
               </span>
             </div>
             <h2 className="text-3xl font-black theme-text font-sans">CleanAgent Protocol Documentation</h2>
             <p className="text-sm theme-text-muted max-w-2xl">
-              Everything you need to know about CleanAgent Protocol — how it works, how to run mandates, and how CVA audit logging operates.
+              Learn how to install the `@cleanagent/sdk`, initialize CLI mandates, and embed automated CVI compliance in your own Web3 dApps.
             </p>
           </div>
 
@@ -67,23 +88,23 @@ function executeRebalanceMandate(address targetPool, uint256 amountUSD) external
           <span className="text-[10px] theme-text-muted uppercase tracking-widest font-bold px-3 py-1 block">TABLE OF CONTENTS</span>
 
           <button
+            onClick={() => setActiveSection('installation')}
+            className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 font-bold cursor-pointer ${
+              activeSection === 'installation' ? 'nav-tab-active' : 'theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e]'
+            }`}
+          >
+            <Download className="w-4 h-4" />
+            1. SDK & CLI Installation
+          </button>
+
+          <button
             onClick={() => setActiveSection('overview')}
             className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 font-bold cursor-pointer ${
               activeSection === 'overview' ? 'nav-tab-active' : 'theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e]'
             }`}
           >
             <Cpu className="w-4 h-4" />
-            1. What is CleanAgent?
-          </button>
-
-          <button
-            onClick={() => setActiveSection('guide')}
-            className={`w-full text-left px-3.5 py-2.5 rounded-xl transition-all flex items-center gap-2 font-bold cursor-pointer ${
-              activeSection === 'guide' ? 'nav-tab-active' : 'theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e]'
-            }`}
-          >
-            <HelpCircle className="w-4 h-4" />
-            2. Step-by-Step User Guide
+            2. Protocol Architecture
           </button>
 
           <button
@@ -93,7 +114,7 @@ function executeRebalanceMandate(address targetPool, uint256 amountUSD) external
             }`}
           >
             <Layers className="w-4 h-4" />
-            3. What is the Audit Ledger For?
+            3. CVA Audit Ledger
           </button>
 
           <button
@@ -110,11 +131,72 @@ function executeRebalanceMandate(address targetPool, uint256 amountUSD) external
         {/* Right Content Area */}
         <div className="lg:col-span-3 theme-card p-8 space-y-8">
           
-          {/* Section 1: What is CleanAgent? */}
+          {/* Section 1: SDK & CLI Installation */}
+          {activeSection === 'installation' && (
+            <div className="space-y-6 animate-in fade-in duration-300 font-mono">
+              <div className="border-b theme-border pb-4">
+                <h3 className="text-2xl font-bold theme-text">1. How to Install CleanAgent SDK & CLI</h3>
+                <p className="text-xs text-purple-500 mt-1">Embed Compliant AI Execution in Your Node.js & React Applications</p>
+              </div>
+
+              {/* npm Package Install */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs theme-text font-bold uppercase">1. Install NPM Package:</span>
+                  <button
+                    onClick={() => handleCopyCode(npmInstallCode, 1)}
+                    className="text-xs text-purple-500 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    {copiedIndex === 1 ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedIndex === 1 ? 'Copied!' : 'Copy Command'}
+                  </button>
+                </div>
+                <pre className="theme-subcard p-4 rounded-xl text-xs text-purple-500 dark:text-[#b87cf8] overflow-x-auto border theme-border font-bold">
+                  {npmInstallCode}
+                </pre>
+              </div>
+
+              {/* CLI Command */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs theme-text font-bold uppercase">2. Initialize via CLI:</span>
+                  <button
+                    onClick={() => handleCopyCode(cliInitCode, 2)}
+                    className="text-xs text-purple-500 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    {copiedIndex === 2 ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedIndex === 2 ? 'Copied!' : 'Copy Command'}
+                  </button>
+                </div>
+                <pre className="theme-subcard p-4 rounded-xl text-xs text-emerald-500 overflow-x-auto border theme-border font-bold">
+                  {cliInitCode}
+                </pre>
+              </div>
+
+              {/* JS / TS SDK Code Snippet */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs theme-text font-bold uppercase">3. Javascript / TypeScript SDK Snippet:</span>
+                  <button
+                    onClick={() => handleCopyCode(jsSdkSnippet, 3)}
+                    className="text-xs text-purple-500 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    {copiedIndex === 3 ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedIndex === 3 ? 'Copied Code' : 'Copy Code'}
+                  </button>
+                </div>
+                <pre className="theme-subcard p-4 rounded-xl text-xs text-purple-600 dark:text-[#b87cf8] overflow-x-auto border theme-border leading-relaxed">
+                  {jsSdkSnippet}
+                </pre>
+              </div>
+            </div>
+          )}
+
+          {/* Section 2: What is CleanAgent? */}
           {activeSection === 'overview' && (
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="border-b theme-border pb-4">
-                <h3 className="text-2xl font-bold theme-text">1. What is CleanAgent Protocol?</h3>
+                <h3 className="text-2xl font-bold theme-text">2. What is CleanAgent Protocol?</h3>
                 <p className="text-xs font-mono text-purple-500 mt-1">Autonomous Compliant DeFi & Yield Platform</p>
               </div>
 
@@ -139,38 +221,6 @@ function executeRebalanceMandate(address targetPool, uint256 amountUSD) external
                 <div className="theme-subcard p-4 rounded-xl">
                   <span className="text-sky-500 font-bold block mb-1">CVA Audit Provenance</span>
                   <span className="theme-text-muted">Immutable cryptographic record of every trade</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Section 2: User Guide */}
-          {activeSection === 'guide' && (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="border-b theme-border pb-4">
-                <h3 className="text-2xl font-bold theme-text">2. How to Use CleanAgent (Step-by-Step)</h3>
-                <p className="text-xs font-mono text-emerald-500 mt-1">Simple 4-Step Protocol Workflow</p>
-              </div>
-
-              <div className="space-y-4 font-mono text-xs">
-                <div className="p-4 theme-subcard rounded-xl space-y-1">
-                  <span className="text-purple-500 font-bold block">Step 1: Connect Web3 Wallet</span>
-                  <p className="theme-text-muted font-sans text-xs">Click "Connect" in the top right to link your MetaMask or Phantom wallet. dApp access is gated to authenticated wallets.</p>
-                </div>
-
-                <div className="p-4 theme-subcard rounded-xl space-y-1">
-                  <span className="text-purple-500 font-bold block">Step 2: Configure Mandate Guardrails</span>
-                  <p className="theme-text-muted font-sans text-xs">Set your **Max Spend Per Tx** limit ($5k - $100k) and **Min APY Target** (1% - 25%). Click "Save Guardrails On-Chain".</p>
-                </div>
-
-                <div className="p-4 theme-subcard rounded-xl space-y-1">
-                  <span className="text-purple-500 font-bold block">Step 3: Run Execution Cycle</span>
-                  <p className="theme-text-muted font-sans text-xs">Click **RUN AGENT EXECUTION CYCLE**. The persistent terminal modal opens, displaying live streaming checks on spend limits, yield thresholds, and CVI clearance.</p>
-                </div>
-
-                <div className="p-4 theme-subcard rounded-xl space-y-1">
-                  <span className="text-purple-500 font-bold block">Step 4: Inspect Audit Provenance</span>
-                  <p className="theme-text-muted font-sans text-xs">Navigate to **Audit Ledger** to view the cryptographic mandate hash and on-chain record for your transaction.</p>
                 </div>
               </div>
             </div>
@@ -236,11 +286,11 @@ function executeRebalanceMandate(address targetPool, uint256 amountUSD) external
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono theme-text-muted font-bold">Solidity Core Method:</span>
                   <button
-                    onClick={() => handleCopyCode(sampleSolidity)}
+                    onClick={() => handleCopyCode(sampleSolidity, 4)}
                     className="text-xs font-mono text-purple-500 hover:underline flex items-center gap-1 cursor-pointer"
                   >
-                    {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copiedCode ? 'Copied!' : 'Copy Code'}
+                    {copiedIndex === 4 ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedIndex === 4 ? 'Copied!' : 'Copy Code'}
                   </button>
                 </div>
 
