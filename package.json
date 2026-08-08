@@ -1,0 +1,26 @@
+{
+  "name": "cleanagent-protocol",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "CleanAgent Protocol - Autonomous Compliant DeFi & Yield Management Engine Built on Cleanverse Agent Skill Framework (Capability #8)",
+  "main": "server/index.js",
+  "scripts": {
+    "test": "hardhat test",
+    "compile": "hardhat compile",
+    "server": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "keywords": [
+    "cleanverse",
+    "cvi",
+    "cva",
+    "agentic-finance",
+    "autonomous-agent",
+    "defi",
+    "yield",
+    "compliance",
+    "monad"
+  ],
+  "author": "CleanAgent Team",
+  "license": "MIT"
+}
