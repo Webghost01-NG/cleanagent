@@ -13,7 +13,11 @@ export default function WalletModal({
 
   if (!isOpen) return null;
 
-  const handleEVM = async () => {
+  const handleEVM = async (e) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
     setErrorMsg(null);
     setLoading(true);
     const res = await onConnectEVM();
@@ -23,7 +27,11 @@ export default function WalletModal({
     }
   };
 
-  const handlePhantom = async () => {
+  const handlePhantom = async (e) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
     setErrorMsg(null);
     setLoading(true);
     const res = await onConnectPhantom();
@@ -44,7 +52,8 @@ export default function WalletModal({
             <h3 className="text-lg font-bold theme-text font-sans">Connect Web3 Wallet</h3>
           </div>
           <button 
-            onClick={() => {
+            onClick={(e) => {
+              if (e) { e.stopPropagation(); e.preventDefault(); }
               setErrorMsg(null);
               onClose();
             }}

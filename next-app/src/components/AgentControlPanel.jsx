@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, ShieldAlert, ShieldCheck, Cpu, Sliders, Zap, Activity, Terminal, Check, AlertCircle } from 'lucide-react';
 
@@ -12,6 +12,7 @@ export default function AgentControlPanel({
   identities,
   onOpenWalletModal
 }) {
+  const mountTimeRef = useRef(Date.now());
   const [selectedPoolId, setSelectedPoolId] = useState(pools[0]?.id || "pool-1");
   const [rebalanceAmountUSD, setRebalanceAmountUSD] = useState(15000);
   
@@ -27,6 +28,9 @@ export default function AgentControlPanel({
   const [toastMessage, setToastMessage] = useState(null);
 
   const currentPool = pools.find(p => p.id === selectedPoolId) || pools[0] || { name: "Monad Vault", ticker: "USDC", apyPercent: 12.8, isCVIVerified: true };
+
+  const shortHash = (hash) => hash ? `${hash.slice(0, 10)}...${hash.slice(-8)}` : '';
+  const shortAddress = (addr) => addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '';
 
   const showToast = (msg, type = "success") => {
     setToastMessage({ msg, type });
@@ -46,6 +50,11 @@ export default function AgentControlPanel({
   };
 
   const runCycleForPool = async (targetPoolId, amountUSD) => {
+    // Protection guard against click-through auto-initiation on login
+    if (Date.now() - mountTimeRef.current < 600) {
+      return;
+    }
+
     if (!currentWallet) {
       onOpenWalletModal();
       return;
@@ -90,7 +99,7 @@ export default function AgentControlPanel({
       return;
     }
 
-    appendLog(`🛡️ Calling CVIIdentityRegistry.isVerified(${targetPool.contractAddress || '0x3b89...'}) on Monad...`, "warn");
+    appendLog(`🛡️ Calling CVIIdentityRegistry.isVerified(${shortAddress(targetPool.contractAddress || '0x3b894e9100000000000000000000000000004e91')}) on Monad...`, "warn");
     await new Promise(r => setTimeout(r, 700));
 
     if (!targetPool.isCVIVerified) {
@@ -112,8 +121,9 @@ export default function AgentControlPanel({
     });
 
     await new Promise(r => setTimeout(r, 600));
+    const txHashFormatted = apiRes.auditRecord?.txHash ? shortHash(apiRes.auditRecord.txHash) : '0x8f3c4e91...5c6d7';
     appendLog(`📝 CVAAuditWrapper.logExecution() recorded Mandate Record #${apiRes.auditRecord?.recordId || 104}`, "success");
-    appendLog(`🔑 Cryptographic CVA Mandate Hash: ${apiRes.auditRecord?.provenanceTxHash || '0x8f3c...'}`, "success");
+    appendLog(`🔑 Cryptographic CVA Mandate Hash: ${txHashFormatted}`, "success");
     appendLog("🎉 AUTONOMOUS AGENT REBALANCE COMPLETE!", "success");
 
     setExecutionResult(apiRes);
@@ -121,25 +131,25 @@ export default function AgentControlPanel({
   };
 
   return (
-    <div id="agent-control-panel-section" className="space-y-8 pt-4">
+    <div id="agent-control-panel-section" className="space-y-8 pt-4 font-sans">
       
       {/* Toast Notification Banner */}
       {toastMessage && (
         <div className={`p-4 rounded-xl font-mono text-xs font-bold border flex items-center justify-between shadow-lg animate-in fade-in ${
           toastMessage.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-600 dark:text-emerald-300' : 'bg-purple-500/10 border-purple-500/40 text-purple-600 dark:text-purple-300'
         }`}>
-          <div className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-emerald-500" />
-            <span>{toastMessage.msg}</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+            <span className="truncate">{toastMessage.msg}</span>
           </div>
-          <button onClick={() => setToastMessage(null)} className="cursor-pointer">✕</button>
+          <button onClick={() => setToastMessage(null)} className="cursor-pointer shrink-0">✕</button>
         </div>
       )}
 
       {/* Hero Highlight Banner */}
       <div className="theme-card p-8 relative overflow-hidden shadow-2xl">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-3">
+          <div className="space-y-3 max-w-4xl">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="px-3.5 py-1 rounded-full theme-subcard font-mono text-xs font-bold uppercase flex items-center gap-1.5 shadow-sm theme-text">
                 <Bot className="w-4 h-4 text-purple-500" />
@@ -151,17 +161,17 @@ export default function AgentControlPanel({
               Autonomous Yield & Rebalance Console
             </h2>
             
-            <p className="text-sm theme-text-muted max-w-3xl leading-relaxed">
+            <p className="text-sm theme-text-muted leading-relaxed">
               CleanAgent continuously monitors liquidity pools, verifies **Cleanverse Verified Identity (CVI)** counterparty credentials on-chain, enforces spend limits, and executes automated yield rebalances with **CVA cryptographic audit trails**.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto shrink-0">
             <button
               onClick={() => runCycleForPool(selectedPoolId, rebalanceAmountUSD)}
               disabled={isExecuting}
               title="Trigger Real-Time On-Chain Mandate & CVI Evaluation Cycle"
-              className="py-5 px-8 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-base flex flex-col items-center justify-center gap-1 shadow-2xl shadow-purple-500/40 uppercase tracking-wider font-mono hover:scale-105 transition-all cursor-pointer"
+              className="py-5 px-8 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-base flex flex-col items-center justify-center gap-1 shadow-2xl shadow-purple-500/40 uppercase tracking-wider font-mono hover:scale-105 transition-all cursor-pointer disabled:opacity-50"
             >
               <div className="flex items-center gap-3">
                 <Zap className="w-6 h-6 text-amber-300 fill-amber-300" />
@@ -207,7 +217,7 @@ export default function AgentControlPanel({
           <div className="flex items-center justify-between border-b theme-border pb-4">
             <div className="flex items-center gap-2.5">
               <Sliders className="w-5 h-5 text-purple-500" />
-              <h3 className="text-xl font-bold theme-text">Agent Mandate Guardrails & Targets</h3>
+              <h3 className="text-xl font-bold theme-text font-sans">Agent Mandate Guardrails & Targets</h3>
             </div>
             <button 
               onClick={handleUpdateMandateSettings}
@@ -223,7 +233,7 @@ export default function AgentControlPanel({
             <select
               value={selectedPoolId}
               onChange={(e) => setSelectedPoolId(e.target.value)}
-              className="w-full theme-subcard theme-text text-sm font-mono rounded-xl p-4 focus:outline-none focus:border-purple-500 cursor-pointer font-bold"
+              className="w-full theme-subcard theme-text text-sm font-mono rounded-xl p-4 focus:outline-none focus:border-purple-500 cursor-pointer font-bold truncate"
             >
               {pools.map(p => (
                 <option key={p.id} value={p.id}>
@@ -278,13 +288,13 @@ export default function AgentControlPanel({
             <div className="theme-subcard p-4 rounded-xl space-y-2">
               <div className="flex justify-between theme-text font-bold">
                 <span>MIN REQUIRED APY:</span>
-                <span className="text-emerald-500">{(minYieldBps / 100)}%</span>
+                <span className="text-emerald-500">{(minYieldBps / 100)}% APY</span>
               </div>
               <input
                 type="range"
-                min="100"
+                min="300"
                 max="2500"
-                step="100"
+                step="50"
                 value={minYieldBps}
                 onChange={(e) => setMinYieldBps(parseInt(e.target.value))}
                 className="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-300 dark:bg-slate-800 rounded-lg"
@@ -292,95 +302,54 @@ export default function AgentControlPanel({
             </div>
 
           </div>
-
-          {/* Scenario Presets */}
-          <div className="theme-subcard p-5 rounded-2xl space-y-3">
-            <span className="text-xs font-mono theme-text-muted uppercase font-bold block">1-CLICK TEST PRESETS (CLICK TO AUTO-EXECUTE):</span>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedPoolId("pool-1");
-                  setRebalanceAmountUSD(15000);
-                  runCycleForPool("pool-1", 15000);
-                }}
-                className="p-3.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-600 dark:text-emerald-300 text-left transition-all font-semibold hover:scale-105 cursor-pointer"
-              >
-                <div className="text-[10px] font-bold">PRESET 1 (PASS)</div>
-                <div className="font-bold theme-text">Monad Vault</div>
-                <div className="text-[10px] opacity-80">12.8% APY | CVI Verified</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedPoolId("pool-4");
-                  setRebalanceAmountUSD(20000);
-                  runCycleForPool("pool-4", 20000);
-                }}
-                className="p-3.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-rose-600 dark:text-rose-300 text-left transition-all font-semibold hover:scale-105 cursor-pointer"
-              >
-                <div className="text-[10px] font-bold">PRESET 2 (REVERT)</div>
-                <div className="font-bold theme-text">Shadow Pool</div>
-                <div className="text-[10px] opacity-80">Unverified | CVI 403</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedPoolId("pool-1");
-                  setRebalanceAmountUSD(35000);
-                  runCycleForPool("pool-1", 35000);
-                }}
-                className="p-3.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-600 dark:text-amber-300 text-left transition-all font-semibold hover:scale-105 cursor-pointer"
-              >
-                <div className="text-[10px] font-bold">PRESET 3 (ABORT)</div>
-                <div className="font-bold theme-text">Limit Exceeded</div>
-                <div className="text-[10px] opacity-80">$35k &gt; $25k Limit</div>
-              </button>
-            </div>
-          </div>
-
         </div>
 
-        {/* Right Column: Real-Time Protocol Trace */}
-        <div className="theme-card p-8 space-y-5 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between border-b theme-border pb-4">
-              <h3 className="text-lg font-bold theme-text flex items-center gap-2">
-                <Cpu className="w-5 h-5 text-purple-500" />
-                Live Evaluation Trace
-              </h3>
-              <button
-                onClick={() => setIsTerminalModalOpen(true)}
-                className="text-xs font-mono text-purple-500 hover:underline font-bold cursor-pointer"
-              >
-                Open Terminal
-              </button>
+        {/* Right Column: Active Wallet & Vault CVI Status */}
+        <div className="space-y-6">
+          
+          <div className="theme-card p-6 space-y-4">
+            <div className="flex items-center gap-2 border-b theme-border pb-3">
+              <Activity className="w-5 h-5 text-emerald-500" />
+              <h3 className="text-lg font-bold theme-text font-sans">Active Web3 Wallet & CVI</h3>
             </div>
 
-            <div className="mt-4 space-y-3 font-mono text-xs">
-              {terminalLogs.length === 0 ? (
-                <div className="p-8 text-center theme-text-muted border border-dashed theme-border rounded-2xl leading-relaxed">
-                  Click <span className="text-purple-500 font-bold">RUN AGENT EXECUTION CYCLE</span> above to trigger real-time on-chain mandate evaluation.
-                </div>
-              ) : (
-                terminalLogs.map((log, idx) => (
-                  <div key={idx} className={`p-3 rounded-xl border flex items-center gap-2 transition-all ${
-                    log.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-600 dark:text-emerald-300' :
-                    log.type === 'error' ? 'bg-rose-500/10 border-rose-500/40 text-rose-600 dark:text-rose-300 font-bold' :
-                    log.type === 'warn' ? 'bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-300' :
-                    'theme-subcard theme-text'
-                  }`}>
-                    <span className="text-[10px] theme-text-muted font-mono">{log.time}</span>
-                    <span>{log.msg}</span>
-                  </div>
-                ))
-              )}
+            <div className="space-y-3 font-mono text-xs">
+              <div className="p-3.5 rounded-xl theme-subcard space-y-1">
+                <span className="text-[10px] theme-text-muted uppercase font-bold block">CONNECTED WALLET</span>
+                <span className="theme-text font-bold text-purple-600 dark:text-[#b87cf8] block font-mono">
+                  {shortAddress(currentWallet)}
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-xl theme-subcard space-y-1">
+                <span className="text-[10px] theme-text-muted uppercase font-bold block">CVI IDENTITY ATTESTATION</span>
+                <span className="text-emerald-500 font-bold flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" /> Cleanverse Tier 1 Accredited
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-xl theme-subcard space-y-1">
+                <span className="text-[10px] theme-text-muted uppercase font-bold block">TARGET VAULT VERIFICATION</span>
+                <span className={`font-bold flex items-center gap-1 ${
+                  currentPool.isCVIVerified ? 'text-emerald-500' : 'text-rose-500'
+                }`}>
+                  {currentPool.isCVIVerified ? (
+                    <>
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      {currentPool.name} — VERIFIED
+                    </>
+                  ) : (
+                    <>
+                      <ShieldAlert className="w-3.5 h-3.5" />
+                      {currentPool.name} — UNVERIFIED
+                    </>
+                  )}
+                </span>
+              </div>
             </div>
           </div>
 
+          {/* Execution Result Box */}
           {executionResult && (
             <div className={`p-5 rounded-2xl border space-y-3 font-mono animate-in fade-in ${
               executionResult.blocked 
@@ -401,9 +370,16 @@ export default function AgentControlPanel({
                 )}
               </div>
 
-              <p className="text-xs leading-relaxed font-semibold">
+              <p className="text-xs leading-relaxed font-semibold break-words">
                 {executionResult.reason || executionResult.message}
               </p>
+
+              {executionResult.auditRecord?.txHash && (
+                <div className="pt-2 border-t border-emerald-500/30 text-[11px] font-mono flex items-center justify-between">
+                  <span className="opacity-80">Provenance Tx:</span>
+                  <span className="font-bold underline cursor-pointer">{shortHash(executionResult.auditRecord.txHash)}</span>
+                </div>
+              )}
             </div>
           )}
 
@@ -411,7 +387,7 @@ export default function AgentControlPanel({
 
       </div>
 
-      {/* Persistent Terminal Modal (STAYS OPEN FOR USER INSPECTION) */}
+      {/* Persistent Terminal Modal */}
       <AnimatePresence>
         {isTerminalModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl">
@@ -447,14 +423,14 @@ export default function AgentControlPanel({
               {/* Terminal Log Output Body */}
               <div className="p-6 font-mono text-xs space-y-2.5 overflow-y-auto flex-1 theme-bg theme-text">
                 {terminalLogs.map((log, idx) => (
-                  <div key={idx} className={`p-2.5 rounded-lg border font-mono ${
+                  <div key={idx} className={`p-2.5 rounded-lg border font-mono break-all max-w-full overflow-hidden ${
                     log.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-600 dark:text-emerald-300' :
                     log.type === 'error' ? 'bg-rose-500/10 border-rose-500/40 text-rose-600 dark:text-rose-200 font-bold' :
                     log.type === 'warn' ? 'bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-300' :
                     log.type === 'sys' ? 'bg-purple-500/10 border-purple-500/40 text-purple-600 dark:text-purple-300 font-bold' :
                     'theme-subcard theme-text'
                   }`}>
-                    <span className="text-[10px] opacity-60 mr-2">[{log.time}]</span>
+                    <span className="text-[10px] opacity-60 mr-2 shrink-0">[{log.time}]</span>
                     <span>{log.msg}</span>
                   </div>
                 ))}
@@ -469,13 +445,13 @@ export default function AgentControlPanel({
 
               {/* Terminal Footer */}
               <div className="theme-subcard px-6 py-4 border-t theme-border flex items-center justify-between">
-                <span className="text-[11px] font-mono theme-text-muted">
+                <span className="text-[11px] font-mono theme-text-muted truncate max-w-xs">
                   Target Pool: <span className="theme-text font-bold">{currentPool.name}</span>
                 </span>
 
                 <button
                   onClick={() => setIsTerminalModalOpen(false)}
-                  className="py-2.5 px-6 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold cursor-pointer shadow-lg"
+                  className="py-2.5 px-6 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold cursor-pointer shadow-lg shrink-0"
                 >
                   Close Terminal Log
                 </button>

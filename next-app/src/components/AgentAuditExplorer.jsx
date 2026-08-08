@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { Layers, ShieldCheck, CheckCircle2, ExternalLink, Hash, Clock, Copy, Check, Terminal, Cpu, Code2 } from 'lucide-react';
+import { Layers, ShieldCheck, CheckCircle2, ExternalLink, Hash, Clock, Copy, Check, Terminal, Cpu, Code2, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AgentAuditExplorer({ auditLogs = [] }) {
@@ -8,6 +8,9 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
   const [copiedTxHash, setCopiedTxHash] = useState(null);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [showRawRPC, setShowRawRPC] = useState(false);
+
+  const shortHash = (hash) => hash ? `${hash.slice(0, 10)}...${hash.slice(-8)}` : '';
+  const shortAddress = (addr) => addr ? `${addr.slice(0, 8)}...${addr.slice(-6)}` : '';
 
   const handleCopyHash = (txHash) => {
     navigator.clipboard.writeText(txHash);
@@ -28,18 +31,22 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
   return (
     <div className="space-y-8 pt-2 font-mono">
       
-      {/* Header Banner */}
+      {/* Public Header Banner */}
       <div className="theme-card p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-2xl">
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="px-3.5 py-1 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/30 text-xs font-bold uppercase flex items-center gap-1.5">
               <Layers className="w-4 h-4 text-sky-500" />
               CVA PROVENANCE PROOF LEDGER
             </span>
+            <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs font-bold uppercase flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-emerald-500" />
+              PUBLIC LEDGER (OPEN TO EVERYONE)
+            </span>
           </div>
           <h2 className="text-3xl font-black theme-text font-sans">Mandate Execution Audit Trail</h2>
           <p className="text-sm theme-text-muted">
-            Every autonomous agent transaction, CVI clearance check, and spend mandate evaluation is immutably signed by `CVAAuditWrapper.sol`.
+            Every autonomous agent transaction, CVI clearance check, and spend mandate evaluation is publicly verifiable and immutably signed by `CVAAuditWrapper.sol`.
           </p>
         </div>
 
@@ -62,7 +69,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
             <Hash className="w-4 h-4 text-purple-500" />
             ON-CHAIN MANDATE AUDIT RECORDS ({filteredLogs.length})
           </h3>
-          <span className="text-[10px] theme-text-muted">Monad Testnet Block Height Sync Active (Chain ID 10143)</span>
+          <span className="text-[10px] theme-text-muted hidden sm:inline">Monad Testnet Block Height Sync Active (Chain ID 10143)</span>
         </div>
 
         <div className="overflow-x-auto">
@@ -75,7 +82,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                 <th className="p-4">Target Vault</th>
                 <th className="p-4">Rebalance Amount</th>
                 <th className="p-4">CVI Identity Tier</th>
-                <th className="p-4">CVA Provenance Tx Hash (Click to Inspect)</th>
+                <th className="p-4">CVA Provenance Tx Hash</th>
               </tr>
             </thead>
             <tbody className="divide-y theme-border theme-text">
@@ -99,11 +106,11 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                       </td>
 
                       <td className="p-4 theme-text-muted flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 opacity-60" />
-                        {new Date(log.timestamp).toLocaleTimeString()}
+                        <Clock className="w-3.5 h-3.5 opacity-60 shrink-0" />
+                        <span>{new Date(log.timestamp).toLocaleTimeString()}</span>
                       </td>
 
-                      <td className="p-4 font-bold theme-text">
+                      <td className="p-4 font-bold theme-text max-w-xs truncate">
                         {log.poolName}
                       </td>
 
@@ -113,23 +120,23 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
 
                       <td className="p-4">
                         <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1 w-fit">
-                          <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                          {log.cviTier}
+                          <ShieldCheck className="w-3 h-3 text-emerald-500 shrink-0" />
+                          <span>{log.cviTier}</span>
                         </span>
                       </td>
 
                       <td className="p-4 font-mono text-[11px]">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 max-w-xs">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedRecord(log);
                             }}
                             title="Inspect On-Chain Mandate Record"
-                            className="text-purple-600 dark:text-[#b87cf8] hover:underline flex items-center gap-1 font-bold cursor-pointer"
+                            className="text-purple-600 dark:text-[#b87cf8] hover:underline flex items-center gap-1 font-bold cursor-pointer truncate"
                           >
-                            {log.txHash?.slice(0, 10)}...{log.txHash?.slice(-8)}
-                            <ExternalLink className="w-3 h-3 opacity-60" />
+                            <span>{shortHash(log.txHash)}</span>
+                            <ExternalLink className="w-3 h-3 opacity-60 shrink-0" />
                           </button>
 
                           <button
@@ -137,7 +144,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                               e.stopPropagation();
                               handleCopyHash(log.txHash);
                             }}
-                            className="p-1 rounded theme-subcard hover:theme-card theme-text-muted hover:theme-text transition-colors cursor-pointer"
+                            className="p-1 rounded theme-subcard hover:theme-card theme-text-muted hover:theme-text transition-colors cursor-pointer shrink-0"
                             title="Copy Full 66-Char EVM Transaction Hash"
                           >
                             {copiedTxHash === log.txHash ? (
@@ -169,12 +176,12 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
             >
               {/* Header */}
               <div className="flex items-center justify-between border-b theme-border pb-4">
-                <div className="flex items-center gap-2.5">
-                  <div className="size-8 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-500 dark:text-[#b87cf8]">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="size-8 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-500 dark:text-[#b87cf8] shrink-0">
                     <Cpu className="size-4" />
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold theme-text uppercase tracking-wide">Monad Testnet Provenance Inspector</h3>
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-bold theme-text uppercase tracking-wide truncate">Monad Testnet Provenance Inspector</h3>
                     <p className="text-[10px] theme-text-muted">Mandate Audit Record #{selectedRecord.recordId}</p>
                   </div>
                 </div>
@@ -184,7 +191,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                     setSelectedRecord(null);
                     setShowRawRPC(false);
                   }}
-                  className="theme-text-muted hover:theme-text text-lg font-bold cursor-pointer"
+                  className="theme-text-muted hover:theme-text text-lg font-bold cursor-pointer shrink-0"
                 >
                   ✕
                 </button>
@@ -193,34 +200,34 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
               {/* Transaction Metrics Grid */}
               <div className="space-y-4 text-xs">
                 
-                <div className="p-4 rounded-xl theme-subcard space-y-2 border theme-border">
+                <div className="p-4 rounded-xl theme-subcard space-y-2 border theme-border overflow-hidden">
                   <div className="flex justify-between items-center text-[10px] theme-text-muted uppercase">
-                    <span>CVA PROVENANCE TX HASH (66-CHAR 32-BYTE EVM)</span>
+                    <span>CVA PROVENANCE TX HASH (66-CHAR EVM)</span>
                     <button
                       onClick={() => handleCopyHash(selectedRecord.txHash)}
-                      className="flex items-center gap-1 text-purple-500 hover:underline font-bold cursor-pointer"
+                      className="flex items-center gap-1 text-purple-500 hover:underline font-bold cursor-pointer shrink-0"
                     >
                       {copiedTxHash === selectedRecord.txHash ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-                      <span>Copy</span>
+                      <span>Copy Full</span>
                     </button>
                   </div>
-                  <div className="text-xs font-bold text-purple-600 dark:text-[#b87cf8] break-all select-all">
+                  <div className="text-xs font-bold text-purple-600 dark:text-[#b87cf8] break-all select-all font-mono">
                     {selectedRecord.txHash}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-3.5 rounded-xl theme-subcard space-y-1">
                     <span className="text-[10px] theme-text-muted uppercase font-bold block">MONAD BLOCK HEIGHT</span>
                     <span className="text-sky-500 font-bold flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      BLOCK #{(selectedRecord.blockNumber || (14892100 + Number(selectedRecord.recordId || 0))).toLocaleString()}
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span>BLOCK #{(selectedRecord.blockNumber || (14892100 + Number(selectedRecord.recordId || 0))).toLocaleString()}</span>
                     </span>
                   </div>
 
-                  <div className="p-3.5 rounded-xl theme-subcard space-y-1">
+                  <div className="p-3.5 rounded-xl theme-subcard space-y-1 overflow-hidden">
                     <span className="text-[10px] theme-text-muted uppercase font-bold block">TARGET VAULT</span>
-                    <span className="theme-text font-bold block">{selectedRecord.poolName}</span>
+                    <span className="theme-text font-bold block truncate">{selectedRecord.poolName}</span>
                   </div>
 
                   <div className="p-3.5 rounded-xl theme-subcard space-y-1">
@@ -237,7 +244,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                 <div className="p-4 rounded-xl theme-subcard space-y-2 border theme-border text-[11px]">
                   <div className="flex justify-between py-1 border-b theme-border">
                     <span className="theme-text-muted">Smart Contract Address:</span>
-                    <span className="theme-text font-bold">CVAAuditWrapper.sol (0x7a834e91...4e91)</span>
+                    <span className="theme-text font-bold font-mono">CVAAuditWrapper.sol (0x7a83...4e91)</span>
                   </div>
                   <div className="flex justify-between py-1 border-b theme-border">
                     <span className="theme-text-muted">Target Chain Network:</span>
@@ -264,7 +271,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                   </button>
 
                   {showRawRPC && (
-                    <div className="p-4 rounded-xl bg-black/90 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono overflow-x-auto space-y-1">
+                    <div className="p-4 rounded-xl bg-black/90 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono overflow-x-auto space-y-1 break-all">
                       <p>{"{"}</p>
                       <p className="pl-4">{`"jsonrpc": "2.0",`}</p>
                       <p className="pl-4">{`"id": 1,`}</p>
