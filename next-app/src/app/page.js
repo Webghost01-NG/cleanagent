@@ -312,11 +312,11 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center sm:items-start gap-1">
             <span className="font-mono text-xs font-bold theme-text tracking-tight flex items-center gap-2">
-              <Bot className="size-4 text-purple-500" />
-              CleanAgent AI (Next.js Edition)
+              <span className="size-5 rounded bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-500 dark:text-[#b87cf8] font-bold text-[10px]">C</span>
+              CleanAgent AI Protocol (Monad Testnet)
             </span>
             <span className="font-mono text-[10px] theme-text-muted">
-              AI-powered autonomous yield & CVI compliance engine
+              Autonomous yield & CVI counterparty compliance engine
             </span>
           </div>
 
