@@ -17,7 +17,7 @@ const API_BASE = '/api';
 export default function Home() {
   const [activeTab, setActiveTab] = useState('control'); // 'chat' | 'control' | 'pools' | 'audit' | 'docs'
   const [currentWallet, setCurrentWallet] = useState(null); // Disconnected by default
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false); // Default to Light Mode
   
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
 
@@ -30,7 +30,7 @@ export default function Home() {
 
   const [pools, setPools] = useState([
     { id: "pool-1", name: "Monad Vault", ticker: "USDC", chain: "Monad Testnet", protocol: "CleanAgent Yield", apyPercent: 12.8, tvlUSD: 8500000, isCVIVerified: true, riskRating: "Low Risk", complianceTier: "Tier 1 Accredited", contractAddress: "0x7a834e9100000000000000000000000000004e91" },
-    { id: "pool-2", name: "Ethereum RWA Treasury Vault", ticker: "USDC", chain: "Ethereum Mainnet", protocol: "Cleanverse Treasury", apyPercent: 9.4, tvlUSD: 12400000, isCVIVerified: true, riskRating: "Low Risk", complianceTier: "Tier 1 Accredited", contractAddress: "0x2546bcd3c84621e976D8185a91A922aE77ECEc30" },
+    { id: "pool-2", name: "Ethereum RWA Treasury Vault", ticker: "USDC", chain: "Ethereum Mainnet", protocol: "Cleanverse Treasury", apyPercent: 9.4, tvlUSD: 12400000, isCVIVerified: true, riskRating: "Low Risk", complianceTier: "Tier 1 Accredited", contractAddress: "0x2546bcd3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7" },
     { id: "pool-3", name: "Base Credit Vault", ticker: "USDC", chain: "Base Mainnet", protocol: "Base Yield Engine", apyPercent: 14.2, tvlUSD: 4100000, isCVIVerified: true, riskRating: "Medium Risk", complianceTier: "Tier 2 Standard", contractAddress: "0x1111222233334444555566667777888899990000" },
     { id: "pool-4", name: "Shadow High-Yield Pool", ticker: "USDC", chain: "Unknown Chain", protocol: "Unverified Shadow DEX", apyPercent: 34.5, tvlUSD: 950000, isCVIVerified: false, riskRating: "High Risk", complianceTier: "Unverified (Will Revert)", contractAddress: "0x9999888877776666555544443333222211110000" }
   ]);
@@ -115,13 +115,6 @@ export default function Home() {
     } else {
       return { success: false, error: res.error || "Phantom Wallet extension not detected." };
     }
-  };
-
-  const handleConnectDemoWallet = async () => {
-    setCurrentWallet('0x2546BcD3c84621e976D8185a91A922aE77ECEc30');
-    setIsWalletModalOpen(false);
-    await fetchProtocolData();
-    return { success: true };
   };
 
   // Run Autonomous Agent Cycle Handler
@@ -209,7 +202,7 @@ export default function Home() {
               <div className="space-y-12 animate-in fade-in duration-200">
                 <HeroAndMasonry
                   onStartAgent={handleStartAgentFromHero}
-                  onOpenDemo={() => setActiveTab('chat')}
+                  onOpenChat={() => setActiveTab('chat')}
                 />
 
                 {!currentWallet ? (
@@ -310,7 +303,6 @@ export default function Home() {
         onClose={() => setIsWalletModalOpen(false)}
         onConnectEVM={handleConnectEVM}
         onConnectPhantom={handleConnectPhantom}
-        onConnectDemoWallet={handleConnectDemoWallet}
       />
 
       {/* Footer */}

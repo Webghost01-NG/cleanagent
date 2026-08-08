@@ -1,13 +1,12 @@
 "use client";
 import React, { useState } from 'react';
-import { Wallet, ShieldCheck, ArrowRight, AlertTriangle, PlayCircle } from 'lucide-react';
+import { Wallet, ArrowRight, AlertTriangle } from 'lucide-react';
 
 export default function WalletModal({ 
   isOpen, 
   onClose, 
   onConnectEVM, 
-  onConnectPhantom,
-  onConnectDemoWallet
+  onConnectPhantom
 }) {
   const [errorMsg, setErrorMsg] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -35,14 +34,14 @@ export default function WalletModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="theme-card w-full max-w-md p-6 space-y-5 shadow-2xl relative border theme-border font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="theme-card w-full max-w-md p-6 space-y-5 shadow-2xl relative border theme-border font-sans rounded-3xl">
         
         {/* Header */}
         <div className="flex items-center justify-between border-b theme-border pb-3">
           <div className="flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-purple-500" />
-            <h3 className="text-lg font-bold theme-text">Connect Web3 Wallet</h3>
+            <Wallet className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <h3 className="text-lg font-bold theme-text font-sans">Connect Web3 Wallet</h3>
           </div>
           <button 
             onClick={() => {
@@ -55,7 +54,7 @@ export default function WalletModal({
           </button>
         </div>
 
-        <p className="text-xs theme-text-muted leading-relaxed">
+        <p className="text-xs theme-text-muted leading-relaxed font-sans">
           Connect your Web3 browser wallet (MetaMask or Phantom) to configure yield mandates, verify CVI ratings, and sign Monad transactions.
         </p>
 
@@ -65,7 +64,7 @@ export default function WalletModal({
             <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
             <div className="space-y-1">
               <p className="font-bold">{errorMsg}</p>
-              <p className="text-[10px] opacity-90">Install MetaMask from <a href="https://metamask.io" target="_blank" rel="noreferrer" className="underline font-bold">metamask.io</a> or use Demo Mode below.</p>
+              <p className="text-[10px] opacity-90">Please install a Web3 wallet extension from <a href="https://metamask.io" target="_blank" rel="noreferrer" className="underline font-bold">metamask.io</a> or <a href="https://phantom.app" target="_blank" rel="noreferrer" className="underline font-bold">phantom.app</a> to interact with CleanAgent Protocol.</p>
             </div>
           </div>
         )}
@@ -82,11 +81,11 @@ export default function WalletModal({
             <div className="flex items-center gap-3">
               <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" className="w-7 h-7" />
               <div>
-                <span className="text-sm font-bold theme-text group-hover:text-purple-500 transition-colors block">MetaMask / Browser EVM</span>
+                <span className="text-sm font-bold theme-text group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors block">MetaMask / Browser EVM</span>
                 <span className="text-[10px] theme-text-muted font-mono">Ethereum, Monad, Base, Arbitrum</span>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 text-purple-500 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform" />
           </button>
 
           {/* Phantom Wallet */}
@@ -100,26 +99,12 @@ export default function WalletModal({
                 👻
               </div>
               <div>
-                <span className="text-sm font-bold theme-text group-hover:text-purple-400 transition-colors block">Phantom Wallet</span>
+                <span className="text-sm font-bold theme-text group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors block">Phantom Wallet</span>
                 <span className="text-[10px] theme-text-muted font-mono">Solana & Multi-Chain EVM</span>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 text-purple-500 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform" />
           </button>
-
-          {/* Demo Mode Button (Explicit Choice Only) */}
-          <div className="pt-2 border-t theme-border">
-            <button
-              onClick={() => {
-                setErrorMsg(null);
-                onConnectDemoWallet();
-              }}
-              className="w-full p-3 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-[#b87cf8] border border-purple-500/30 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-all"
-            >
-              <PlayCircle className="w-4 h-4" />
-              <span>Continue with Simulated Demo Wallet (Testing Only)</span>
-            </button>
-          </div>
 
         </div>
 

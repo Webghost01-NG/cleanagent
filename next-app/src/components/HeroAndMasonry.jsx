@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Bot, ShieldCheck, Layers, Zap, Sparkles, CheckCircle2, Terminal } from 'lucide-react';
 
-export default function HeroAndMasonry({ onStartAgent, onOpenDemo }) {
+export default function HeroAndMasonry({ onStartAgent, onOpenChat }) {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -71,7 +71,7 @@ export default function HeroAndMasonry({ onStartAgent, onOpenDemo }) {
             </button>
 
             <button
-              onClick={onOpenDemo}
+              onClick={onOpenChat}
               title="Open Natural Language AI Agent Console"
               className="py-4 px-8 rounded-xl theme-subcard theme-text theme-border border text-sm font-mono font-bold flex flex-col items-center gap-1 transition-all hover:scale-105 cursor-pointer"
             >
@@ -83,17 +83,53 @@ export default function HeroAndMasonry({ onStartAgent, onOpenDemo }) {
             </button>
           </div>
 
-          {/* Trust Pills */}
+          {/* Key Bullet Metrics */}
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs font-mono theme-text-muted pt-6">
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> CVI Verified Identity</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> CVA Asset Provenance</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Monad & Multi-Chain</span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              CVI Verified Identity
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              CVA Asset Provenance
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              Monad & Multi-Chain
+            </span>
           </div>
 
         </motion.div>
       </div>
 
-      {/* Masonry Capability Grid */}
+      {/* Infinite Horizontal Scrolling Multi-Chain Marquee Loop */}
+      <div className="space-y-4">
+        <div className="text-center space-y-1">
+          <p className="font-mono text-xs font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400">
+            USE CLEANAGENT TO BUILD ON ANY EVM CHAIN
+          </p>
+        </div>
+
+        <div className="relative w-full overflow-hidden py-3">
+          {/* Edge Gradient Fades */}
+          <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div>
+
+          <div className="animate-marquee flex items-center gap-4">
+            {[...chainsList, ...chainsList, ...chainsList].map((chain, idx) => (
+              <div
+                key={idx}
+                className="px-5 py-2.5 rounded-full theme-subcard border theme-border font-mono text-xs font-bold theme-text flex items-center gap-2 shrink-0 shadow-sm hover:border-purple-500 transition-all cursor-pointer hover:scale-105"
+              >
+                <span className="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>⚡ {chain}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Feature Grid */}
       <motion.div 
         variants={containerVariants}
         initial="hidden"
@@ -102,85 +138,42 @@ export default function HeroAndMasonry({ onStartAgent, onOpenDemo }) {
         className="space-y-6"
       >
         <div className="text-center space-y-2">
-          <h2 className="text-3xl font-black theme-text">Every Blockchain Feature Integrated as a Platform</h2>
+          <h2 className="text-3xl font-black theme-text font-sans">Every Blockchain Feature Integrated as a Platform</h2>
           <p className="text-sm theme-text-muted">Frontend stays thin. Servers disappear. CleanAgent workflows become your backend.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Card 1 */}
-          <motion.div 
-            variants={itemVariants} 
-            onClick={onStartAgent}
-            className="theme-card p-6 space-y-4 cursor-pointer group"
-          >
+          <motion.div variants={itemVariants} className="theme-card p-6 space-y-4 cursor-pointer group">
             <div className="w-12 h-12 rounded-2xl theme-subcard flex items-center justify-center text-purple-500 dark:text-[#b87cf8] group-hover:scale-110 transition-transform">
               <Bot className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold theme-text group-hover:text-purple-500 transition-colors">Smart Agent Mandates</h3>
-            <p className="text-xs theme-text-muted leading-relaxed font-light">
+            <h3 className="text-xl font-bold theme-text group-hover:text-purple-500 transition-colors font-sans">Smart Agent Mandates</h3>
+            <p className="text-xs theme-text-muted leading-relaxed font-light font-sans">
               Add programmable smart mandates. No private-key handling, no server setup. We manage execution & spend limits automatically.
             </p>
           </motion.div>
 
-          {/* Card 2 */}
-          <motion.div 
-            variants={itemVariants} 
-            onClick={onStartAgent}
-            className="theme-card p-6 space-y-4 cursor-pointer group"
-          >
+          <motion.div variants={itemVariants} className="theme-card p-6 space-y-4 cursor-pointer group">
             <div className="w-12 h-12 rounded-2xl theme-subcard flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold theme-text group-hover:text-emerald-500 transition-colors">CVI Counterparty Verifier</h3>
-            <p className="text-xs theme-text-muted leading-relaxed font-light">
+            <h3 className="text-xl font-bold theme-text group-hover:text-emerald-500 transition-colors font-sans">CVI Counterparty Verifier</h3>
+            <p className="text-xs theme-text-muted leading-relaxed font-light font-sans">
               Monitor target liquidity pools, EOAs, or smart contracts on-chain. The moment a pool lacks CVI, execution aborts instantly.
             </p>
           </motion.div>
 
-          {/* Card 3 */}
-          <motion.div 
-            variants={itemVariants} 
-            onClick={onStartAgent}
-            className="theme-card p-6 space-y-4 cursor-pointer group"
-          >
+          <motion.div variants={itemVariants} className="theme-card p-6 space-y-4 cursor-pointer group">
             <div className="w-12 h-12 rounded-2xl theme-subcard flex items-center justify-center text-sky-500 group-hover:scale-110 transition-transform">
               <Layers className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold theme-text group-hover:text-sky-500 transition-colors">CVA Provenance Manager</h3>
-            <p className="text-xs theme-text-muted leading-relaxed font-light">
-              Execute, retry, and finalize autonomous rebalance transactions with strong CVA cryptographic audit guarantees.
+            <h3 className="text-xl font-bold theme-text group-hover:text-sky-500 transition-colors font-sans">CVA Provenance Tracking</h3>
+            <p className="text-xs theme-text-muted leading-relaxed font-light font-sans">
+              Every rebalance creates an immutable, verifiable proof record on Monad Testnet for auditing and compliance transparency.
             </p>
           </motion.div>
-
         </div>
       </motion.div>
-
-      {/* Infinite Moving Multi-Chain Marquee Banner */}
-      <div className="theme-card p-6 overflow-hidden space-y-4 rounded-3xl relative shadow-xl">
-        <span className="text-xs font-mono theme-text-muted uppercase tracking-widest font-extrabold block text-center">
-          USE CLEANAGENT TO BUILD ON ANY EVM CHAIN
-        </span>
-
-        {/* Continuous Marquee Track */}
-        <div className="relative overflow-hidden w-full py-2">
-          {/* Gradient Edge Blurs */}
-          <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[var(--bg-card)] to-transparent z-10 pointer-events-none"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[var(--bg-card)] to-transparent z-10 pointer-events-none"></div>
-
-          <div className="animate-marquee flex items-center gap-4">
-            {[...chainsList, ...chainsList, ...chainsList].map((chain, idx) => (
-              <span 
-                key={idx} 
-                className="px-5 py-2.5 rounded-xl theme-subcard text-xs font-mono theme-text font-bold shadow-md hover:border-purple-500 hover:scale-105 transition-all shrink-0 flex items-center gap-2 cursor-pointer"
-              >
-                <span className="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                ⚡ {chain}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
 
     </div>
   );
