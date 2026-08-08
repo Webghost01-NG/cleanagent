@@ -2,13 +2,14 @@
   "name": "cleanagent-protocol",
   "version": "1.0.0",
   "type": "module",
-  "description": "CleanAgent Protocol - Autonomous Compliant DeFi & Yield Management Engine Built on Cleanverse Agent Skill Framework (Capability #8)",
+  "description": "CleanAgent Protocol - Autonomous Compliant DeFi & Yield Management Engine Built on Cleanverse Agent Skill Framework",
   "main": "server/index.js",
   "scripts": {
-    "test": "hardhat test",
+    "build": "cd next-app && npm install && npm run build",
+    "dev": "cd next-app && npm run dev",
+    "start": "cd next-app && npm run start",
     "compile": "hardhat compile",
-    "server": "node server/index.js",
-    "dev": "node server/index.js"
+    "test": "hardhat test"
   },
   "keywords": [
     "cleanverse",
