@@ -1,11 +1,10 @@
 import React from 'react';
-import { Bot, ShieldCheck, Cpu, Layers, Wallet, FileText, ChevronDown, Sparkles } from 'lucide-react';
+import { Bot, ShieldCheck, Cpu, Layers, Wallet, ChevronDown, Sparkles } from 'lucide-react';
 
 export default function Navbar({ 
   currentWallet, 
   identities, 
   onOpenWalletModal, 
-  onOpenSummaryModal,
   activeTab, 
   setActiveTab,
   selectedNetwork,
@@ -22,10 +21,10 @@ export default function Navbar({
   const shortAddress = currentWallet ? `${currentWallet.slice(0, 6)}...${currentWallet.slice(-4)}` : "Not Connected";
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-2xl bg-[#060913]/85 border-b border-slate-800/80 px-4 lg:px-8 py-3.5">
+    <header className="sticky top-0 z-50 backdrop-blur-2xl bg-[#060913]/90 border-b border-slate-800/80 px-4 lg:px-8 py-3.5">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         
-        {/* Brand Logo & Tag */}
+        {/* Brand Logo */}
         <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveTab('control')}>
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-500 via-indigo-500 to-emerald-400 p-0.5 shadow-xl shadow-purple-500/20 group-hover:scale-105 transition-transform">
@@ -103,17 +102,8 @@ export default function Navbar({
 
         </nav>
 
-        {/* Action Buttons */}
+        {/* Connect Wallet Button */}
         <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
-          
-          <button
-            onClick={onOpenSummaryModal}
-            className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700/80 text-xs font-mono font-bold flex items-center gap-1 transition-all shadow-md"
-            title="One-Page Submission Summary"
-          >
-            <FileText className="w-4.5 h-4.5 text-purple-400" />
-          </button>
-
           <button
             onClick={onOpenWalletModal}
             className="btn-primary flex items-center gap-2.5 text-xs py-2.5 px-4 shadow-xl"
@@ -127,7 +117,6 @@ export default function Navbar({
             </div>
             <ChevronDown className="w-3.5 h-3.5 opacity-70" />
           </button>
-
         </div>
 
       </div>

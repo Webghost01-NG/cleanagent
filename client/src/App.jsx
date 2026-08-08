@@ -5,7 +5,6 @@ import AgentControlPanel from './components/AgentControlPanel';
 import CompliantPools from './components/CompliantPools';
 import AgentAuditExplorer from './components/AgentAuditExplorer';
 import WalletModal from './components/WalletModal';
-import SummaryModal from './components/SummaryModal';
 import { connectEVMWallet, connectPhantomWallet } from './services/web3';
 import { Bot } from 'lucide-react';
 
@@ -17,7 +16,6 @@ export default function App() {
   const [selectedNetwork, setSelectedNetwork] = useState('monad');
   
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
-  const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
 
   const [stats, setStats] = useState(null);
   const [pools, setPools] = useState([]);
@@ -116,6 +114,14 @@ export default function App() {
     }
   };
 
+  const handleSelectPoolForRebalance = (poolId) => {
+    setActiveTab('control');
+    setTimeout(() => {
+      const elem = document.getElementById('agent-control-panel-section');
+      if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
   return (
     <div className="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white bg-[#060913]">
       
@@ -124,7 +130,6 @@ export default function App() {
         currentWallet={currentWallet}
         identities={identities}
         onOpenWalletModal={() => setIsWalletModalOpen(true)}
-        onOpenSummaryModal={() => setIsSummaryModalOpen(true)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         selectedNetwork={selectedNetwork}
@@ -163,6 +168,7 @@ export default function App() {
               <CompliantPools
                 pools={pools}
                 mandate={mandate}
+                onSelectPoolForRebalance={handleSelectPoolForRebalance}
               />
             )}
 
@@ -186,11 +192,6 @@ export default function App() {
         identities={identities}
       />
 
-      <SummaryModal
-        isOpen={isSummaryModalOpen}
-        onClose={() => setIsSummaryModalOpen(false)}
-      />
-
       {/* Footer */}
       <footer className="border-t border-slate-800/80 bg-[#060913]/95 backdrop-blur-md py-8 px-4 text-center text-xs font-mono text-slate-400 mt-12">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -200,7 +201,6 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
-            <button onClick={() => setIsSummaryModalOpen(true)} className="text-purple-400 hover:underline">One-Page Summary</button>
             <span className="text-emerald-400">CVI Verified Identity</span>
             <span className="text-sky-400">CVA Audit Provenance</span>
           </div>

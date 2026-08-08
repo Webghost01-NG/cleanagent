@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Bot, ShieldCheck, Cpu, Layers, ArrowRight, Zap, Sparkles, CheckCircle2, Lock, Activity, Globe, Terminal } from 'lucide-react';
+import { Bot, ShieldCheck, Cpu, Layers, ArrowRight, Zap, Sparkles, CheckCircle2, Terminal } from 'lucide-react';
 
 export default function KwalaHeroAndMasonry({ onStartAgent, onOpenDemo }) {
   const containerVariants = {
@@ -16,11 +16,19 @@ export default function KwalaHeroAndMasonry({ onStartAgent, onOpenDemo }) {
     visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: "easeOut" } }
   };
 
+  const handleHeroAction = () => {
+    onStartAgent();
+    const elem = document.getElementById('agent-control-panel-section');
+    if (elem) {
+      elem.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="space-y-16 py-4">
       
       {/* Kwala-Style Deep Hero Section */}
-      <div className="relative rounded-3xl p-8 sm:p-12 md:p-16 overflow-hidden border border-purple-500/20 bg-[#100029] shadow-2xl">
+      <div className="relative rounded-3xl p-8 sm:p-12 md:p-16 overflow-hidden border border-purple-500/30 bg-[#100029] shadow-2xl">
         
         {/* Glow Spheres */}
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/25 rounded-full blur-[100px] pointer-events-none"></div>
@@ -48,7 +56,7 @@ export default function KwalaHeroAndMasonry({ onStartAgent, onOpenDemo }) {
           {/* Action CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <button
-              onClick={onStartAgent}
+              onClick={handleHeroAction}
               className="btn-primary py-4 px-8 text-sm font-extrabold flex items-center gap-2.5 shadow-2xl shadow-purple-500/40 uppercase tracking-wider font-mono hover:scale-105 transition-transform"
             >
               <Zap className="w-5 h-5 text-amber-300 fill-amber-300" />
@@ -56,8 +64,8 @@ export default function KwalaHeroAndMasonry({ onStartAgent, onOpenDemo }) {
             </button>
 
             <button
-              onClick={onOpenDemo}
-              className="py-4 px-8 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 text-sm font-mono font-bold flex items-center gap-2 transition-all"
+              onClick={handleHeroAction}
+              className="py-4 px-8 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 text-sm font-mono font-bold flex items-center gap-2 transition-all hover:scale-105"
             >
               <Terminal className="w-4 h-4 text-emerald-400" />
               INSPECT LIVE AGENT TRACE
@@ -65,7 +73,7 @@ export default function KwalaHeroAndMasonry({ onStartAgent, onOpenDemo }) {
           </div>
 
           {/* Trust Pills */}
-          <div className="flex items-center justify-center gap-6 text-xs font-mono text-slate-400 pt-6">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-xs font-mono text-slate-400 pt-6">
             <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> CVI Verified Identity</span>
             <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> CVA Asset Provenance</span>
             <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> Monad & Multi-Chain</span>
@@ -90,33 +98,45 @@ export default function KwalaHeroAndMasonry({ onStartAgent, onOpenDemo }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           {/* Card 1 */}
-          <motion.div variants={itemVariants} className="glass-panel p-6 space-y-4 hover:border-purple-500/50 transition-colors">
-            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+          <motion.div 
+            variants={itemVariants} 
+            onClick={handleHeroAction}
+            className="glass-panel p-6 space-y-4 hover:border-purple-500/50 transition-colors cursor-pointer group"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
               <Bot className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white">Smart Agent Mandates</h3>
+            <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">Smart Agent Mandates</h3>
             <p className="text-xs text-slate-300 leading-relaxed font-light">
               Add programmable smart mandates. No private-key handling, no server setup. We manage execution & spend limits automatically.
             </p>
           </motion.div>
 
           {/* Card 2 */}
-          <motion.div variants={itemVariants} className="glass-panel p-6 space-y-4 hover:border-emerald-500/50 transition-colors">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+          <motion.div 
+            variants={itemVariants} 
+            onClick={handleHeroAction}
+            className="glass-panel p-6 space-y-4 hover:border-emerald-500/50 transition-colors cursor-pointer group"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white">CVI Counterparty Verifier</h3>
+            <h3 className="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">CVI Counterparty Verifier</h3>
             <p className="text-xs text-slate-300 leading-relaxed font-light">
               Monitor target liquidity pools, EOAs, or smart contracts on-chain. The moment a pool lacks CVI, execution aborts instantly.
             </p>
           </motion.div>
 
           {/* Card 3 */}
-          <motion.div variants={itemVariants} className="glass-panel p-6 space-y-4 hover:border-sky-500/50 transition-colors">
-            <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+          <motion.div 
+            variants={itemVariants} 
+            onClick={handleHeroAction}
+            className="glass-panel p-6 space-y-4 hover:border-sky-500/50 transition-colors cursor-pointer group"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform">
               <Layers className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white">CVA Provenance Manager</h3>
+            <h3 className="text-xl font-bold text-white group-hover:text-sky-300 transition-colors">CVA Provenance Manager</h3>
             <p className="text-xs text-slate-300 leading-relaxed font-light">
               Execute, retry, and finalize autonomous rebalance transactions with strong CVA cryptographic audit guarantees.
             </p>
@@ -132,7 +152,7 @@ export default function KwalaHeroAndMasonry({ onStartAgent, onOpenDemo }) {
         </span>
         <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
           {['Monad Testnet', 'Ethereum Mainnet', 'Base Mainnet', 'Arbitrum One', 'BNB Chain', 'Polygon', 'HashKey'].map((chain, idx) => (
-            <span key={idx} className="px-4 py-2 rounded-xl bg-slate-900/90 border border-slate-800 text-xs font-mono text-slate-200 font-semibold shadow-md">
+            <span key={idx} className="px-4 py-2 rounded-xl bg-slate-900/90 border border-slate-800 text-xs font-mono text-slate-200 font-semibold shadow-md hover:border-purple-500/40 transition-colors">
               ⚡ {chain}
             </span>
           ))}

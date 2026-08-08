@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bot, Play, ShieldAlert, ShieldCheck, CheckCircle2, AlertOctagon, Cpu, DollarSign, Sliders, ArrowRight, Zap, Sparkles, Activity } from 'lucide-react';
+import { Bot, ShieldAlert, ShieldCheck, CheckCircle2, AlertOctagon, Cpu, Sliders, Zap, Activity } from 'lucide-react';
 
 export default function AgentControlPanel({ 
   pools, 
@@ -19,48 +19,59 @@ export default function AgentControlPanel({
   const currentPool = pools.find(p => p.id === selectedPoolId) || pools[0];
   const currentIdentity = identities.find(i => i.wallet === currentWallet) || { name: "Current Wallet", isVerified: false };
 
-  const handleTriggerAgentCycle = async () => {
+  const runCycleForPool = async (targetPoolId, amountUSD) => {
+    const targetPool = pools.find(p => p.id === targetPoolId) || currentPool;
     setIsExecuting(true);
     setExecutionResult(null);
     setEvaluationSteps([
       { step: 1, text: "Reading Cleanverse Agent Skill Mandate parameters...", status: "pending" }
     ]);
 
-    await new Promise(r => setTimeout(r, 350));
+    await new Promise(r => setTimeout(r, 250));
     setEvaluationSteps(prev => [
-      { step: 1, text: `Mandate Check: Per-Tx Limit $${mandate.maxSpendPerTxUSD.toLocaleString()} USD`, status: rebalanceAmountUSD <= mandate.maxSpendPerTxUSD ? "pass" : "fail" },
-      { step: 2, text: `Target Yield Check: Pool ${currentPool.apyPercent}% APY vs Required ${(mandate.minRequiredYieldBps / 100)}% APY`, status: "pending" }
+      { step: 1, text: `Mandate Check: Per-Tx Limit $${mandate.maxSpendPerTxUSD.toLocaleString()} USD`, status: amountUSD <= mandate.maxSpendPerTxUSD ? "pass" : "fail" },
+      { step: 2, text: `Target Yield Check: Pool ${targetPool.apyPercent}% APY vs Required ${(mandate.minRequiredYieldBps / 100)}% APY`, status: "pending" }
     ]);
 
-    await new Promise(r => setTimeout(r, 450));
-    const yieldPass = currentPool.apyPercent >= (mandate.minRequiredYieldBps / 100);
+    await new Promise(r => setTimeout(r, 350));
+    const yieldPass = targetPool.apyPercent >= (mandate.minRequiredYieldBps / 100);
     setEvaluationSteps(prev => [
       prev[0],
-      { step: 2, text: `Target Yield Check: Pool ${currentPool.apyPercent}% APY vs Required ${(mandate.minRequiredYieldBps / 100)}% APY`, status: yieldPass ? "pass" : "fail" },
-      { step: 3, text: `Evaluating Cleanverse CVI Counterparty Clearance (${currentPool.name})...`, status: "pending" }
+      { step: 2, text: `Target Yield Check: Pool ${targetPool.apyPercent}% APY vs Required ${(mandate.minRequiredYieldBps / 100)}% APY`, status: yieldPass ? "pass" : "fail" },
+      { step: 3, text: `Evaluating Cleanverse CVI Counterparty Clearance (${targetPool.name})...`, status: "pending" }
     ]);
 
-    await new Promise(r => setTimeout(r, 450));
+    await new Promise(r => setTimeout(r, 350));
     
     // Execute backend agent cycle
     const result = await onRunAgentCycle({
-      targetPoolId: selectedPoolId,
-      amountUSD: rebalanceAmountUSD
+      targetPoolId: targetPoolId,
+      amountUSD: amountUSD
     });
 
-    const cviPass = currentPool.isCVIVerified;
+    const cviPass = targetPool.isCVIVerified && (amountUSD <= mandate.maxSpendPerTxUSD) && yieldPass;
     setEvaluationSteps(prev => [
       prev[0],
       prev[1],
-      { step: 3, text: `CVI Counterparty Check: ${currentPool.name} (${cviPass ? 'CVI VERIFIED' : 'UNVERIFIED POOL - REVERT'})`, status: cviPass ? "pass" : "fail" }
+      { step: 3, text: `CVI Counterparty Check: ${targetPool.name} (${targetPool.isCVIVerified ? 'CVI VERIFIED' : 'UNVERIFIED POOL - REVERT'})`, status: targetPool.isCVIVerified ? "pass" : "fail" }
     ]);
 
     setExecutionResult(result);
     setIsExecuting(false);
   };
 
+  const handleTriggerAgentCycle = () => {
+    runCycleForPool(selectedPoolId, rebalanceAmountUSD);
+  };
+
+  const handlePresetSelect = (poolId, amount) => {
+    setSelectedPoolId(poolId);
+    setRebalanceAmountUSD(amount);
+    runCycleForPool(poolId, amount);
+  };
+
   return (
-    <div className="space-y-8">
+    <div id="agent-control-panel-section" className="space-y-8 pt-4">
       
       {/* Hero Highlight Banner */}
       <div className="glass-panel p-8 relative overflow-hidden border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-[#0d1324] to-indigo-950/30">
@@ -146,7 +157,7 @@ export default function AgentControlPanel({
               <Sliders className="w-5 h-5 text-purple-400" />
               <h3 className="text-xl font-bold text-white">Configure Autonomous Rebalance Mandate</h3>
             </div>
-            <span className="text-xs font-mono text-slate-400">Step 1 of 2</span>
+            <span className="text-xs font-mono text-slate-400 font-bold">Step 1 of 2</span>
           </div>
 
           <div>
@@ -187,18 +198,15 @@ export default function AgentControlPanel({
             </div>
           </div>
 
-          {/* Scenario Presets */}
+          {/* Scenario Presets (Instant Auto-Run) */}
           <div className="bg-slate-950/60 p-5 rounded-2xl border border-slate-800/80 space-y-3">
-            <span className="text-xs font-mono text-slate-400 uppercase font-bold block">TEST SCENARIO PRESETS:</span>
+            <span className="text-xs font-mono text-slate-400 uppercase font-bold block">1-CLICK TEST SCENARIO PRESETS (AUTO-RUN):</span>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
               <button
                 type="button"
-                onClick={() => {
-                  setSelectedPoolId("pool-1");
-                  setRebalanceAmountUSD(15000);
-                }}
-                className="p-3 rounded-xl bg-emerald-950/40 hover:bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 text-left transition-all font-semibold"
+                onClick={() => handlePresetSelect("pool-1", 15000)}
+                className="p-3 rounded-xl bg-emerald-950/40 hover:bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-left transition-all font-semibold hover:scale-105"
               >
                 <div className="text-[10px] text-emerald-400 font-bold">PRESET 1 (PASS)</div>
                 <div>Monad Vault</div>
@@ -207,11 +215,8 @@ export default function AgentControlPanel({
 
               <button
                 type="button"
-                onClick={() => {
-                  setSelectedPoolId("pool-4");
-                  setRebalanceAmountUSD(20000);
-                }}
-                className="p-3 rounded-xl bg-rose-950/40 hover:bg-rose-950/70 border border-rose-500/40 text-rose-300 text-left transition-all font-semibold"
+                onClick={() => handlePresetSelect("pool-4", 20000)}
+                className="p-3 rounded-xl bg-rose-950/40 hover:bg-rose-950/80 border border-rose-500/50 text-rose-300 text-left transition-all font-semibold hover:scale-105"
               >
                 <div className="text-[10px] text-rose-400 font-bold">PRESET 2 (REVERT)</div>
                 <div>Shadow Pool</div>
@@ -220,11 +225,8 @@ export default function AgentControlPanel({
 
               <button
                 type="button"
-                onClick={() => {
-                  setSelectedPoolId("pool-1");
-                  setRebalanceAmountUSD(35000);
-                }}
-                className="p-3 rounded-xl bg-amber-950/40 hover:bg-amber-950/70 border border-amber-500/40 text-amber-300 text-left transition-all font-semibold"
+                onClick={() => handlePresetSelect("pool-1", 35000)}
+                className="p-3 rounded-xl bg-amber-950/40 hover:bg-amber-950/80 border border-amber-500/50 text-amber-300 text-left transition-all font-semibold hover:scale-105"
               >
                 <div className="text-[10px] text-amber-400 font-bold">PRESET 3 (ABORT)</div>
                 <div>Spend Limit Exceeded</div>
@@ -246,7 +248,7 @@ export default function AgentControlPanel({
             <div className="mt-4 space-y-3 font-mono text-xs">
               {evaluationSteps.length === 0 ? (
                 <div className="p-8 text-center text-slate-500 border border-dashed border-slate-800 rounded-2xl leading-relaxed">
-                  Click <span className="text-purple-400 font-bold">Run Autonomous Agent Execution</span> to see the Cleanverse Agent Skill Framework evaluate mandate rules & counterparty CVI compliance in real-time.
+                  Click <span className="text-purple-400 font-bold">Run Autonomous Agent Execution</span> or select a <span className="text-emerald-400 font-bold">Preset Button</span> to see the Cleanverse Agent Skill Framework evaluate mandate rules & counterparty CVI compliance in real-time.
                 </div>
               ) : (
                 evaluationSteps.map((s, idx) => (
