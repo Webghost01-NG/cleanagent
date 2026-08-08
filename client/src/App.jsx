@@ -8,14 +8,14 @@ import AgentAuditExplorer from './components/AgentAuditExplorer';
 import DocsView from './components/DocsView';
 import WalletModal from './components/WalletModal';
 import { connectEVMWallet, connectPhantomWallet } from './services/web3';
-import { Bot, ArrowRight, GitFork } from 'lucide-react';
+import { Bot, GitFork } from 'lucide-react';
 
 const API_BASE = 'http://localhost:5001/api';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('control'); // 'chat' | 'control' | 'pools' | 'audit' | 'docs'
   const [currentWallet, setCurrentWallet] = useState('0x2546BcD3c84621e976D8185a91A922aE77ECEc30');
-  const [selectedNetwork, setSelectedNetwork] = useState('monad');
+  const [isDarkMode, setIsDarkMode] = useState(true);
   
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
 
@@ -32,6 +32,15 @@ export default function App() {
   const [identities, setIdentities] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Sync Dark mode class on html element
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
 
   // Fetch initial protocol state from Express Backend
   const fetchProtocolData = async () => {
@@ -125,7 +134,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between selection:bg-[#b87cf8] selection:text-[#0f0e17] bg-[#0f0e17] kwala-dot-grid text-[#f4f3fb]">
+    <div className="min-h-screen flex flex-col justify-between selection:bg-[#b87cf8] selection:text-[#0f0e17] bg-background kwala-dot-grid text-foreground">
       
       {/* Top Floating Kwala-Style Navbar */}
       <KwalaNavbar
@@ -134,60 +143,70 @@ export default function App() {
         currentWallet={currentWallet}
         onOpenWalletModal={() => setIsWalletModalOpen(true)}
         identities={identities}
+        isDarkMode={isDarkMode}
+        onToggleTheme={() => setIsDarkMode(!isDarkMode)}
       />
 
       {/* Main Container */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-12">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-8">
         
-        {/* Kwala Hero & Feature Masonry Banner */}
-        <KwalaHeroAndMasonry
-          onStartAgent={() => setActiveTab('control')}
-          onOpenDemo={() => setActiveTab('chat')}
-        />
-
-        {/* Tab Views */}
+        {/* Tab Views - Immediate rendering upon tab click */}
         {loading ? (
-          <div className="kwala-card p-12 text-center text-[#9a98b0] font-mono space-y-3">
+          <div className="kwala-card p-12 text-center text-muted-foreground font-mono space-y-3">
             <div className="size-8 border-2 border-[#b87cf8] border-t-transparent rounded-full animate-spin mx-auto"></div>
             <p>Connecting to CleanAgent Server...</p>
           </div>
         ) : (
           <>
-            {activeTab === 'chat' && (
-              <KwalaAgentChat
-                pools={pools}
-                mandate={mandate}
-                onRunAgentCycle={handleRunAgentCycle}
-              />
+            {activeTab === 'control' && (
+              <div className="space-y-12 animate-in fade-in duration-200">
+                <KwalaHeroAndMasonry
+                  onStartAgent={() => setActiveTab('control')}
+                  onOpenDemo={() => setActiveTab('chat')}
+                />
+                <AgentControlPanel
+                  pools={pools}
+                  mandate={mandate}
+                  onRunAgentCycle={handleRunAgentCycle}
+                  onUpdateMandate={handleUpdateMandate}
+                  currentWallet={currentWallet}
+                  identities={identities}
+                />
+              </div>
             )}
 
-            {activeTab === 'control' && (
-              <AgentControlPanel
-                pools={pools}
-                mandate={mandate}
-                onRunAgentCycle={handleRunAgentCycle}
-                onUpdateMandate={handleUpdateMandate}
-                currentWallet={currentWallet}
-                identities={identities}
-              />
+            {activeTab === 'chat' && (
+              <div className="animate-in fade-in duration-200">
+                <KwalaAgentChat
+                  pools={pools}
+                  mandate={mandate}
+                  onRunAgentCycle={handleRunAgentCycle}
+                />
+              </div>
             )}
 
             {activeTab === 'pools' && (
-              <CompliantPools
-                pools={pools}
-                mandate={mandate}
-                onSelectPoolForRebalance={handleSelectPoolForRebalance}
-              />
+              <div className="animate-in fade-in duration-200">
+                <CompliantPools
+                  pools={pools}
+                  mandate={mandate}
+                  onSelectPoolForRebalance={handleSelectPoolForRebalance}
+                />
+              </div>
             )}
 
             {activeTab === 'audit' && (
-              <AgentAuditExplorer
-                auditLogs={auditLogs}
-              />
+              <div className="animate-in fade-in duration-200">
+                <AgentAuditExplorer
+                  auditLogs={auditLogs}
+                />
+              </div>
             )}
 
             {activeTab === 'docs' && (
-              <DocsView />
+              <div className="animate-in fade-in duration-200">
+                <DocsView />
+              </div>
             )}
           </>
         )}
@@ -205,31 +224,31 @@ export default function App() {
       />
 
       {/* kwala-mcp Footer */}
-      <footer className="w-full bg-[#0f0e17] border-t border-[#2a283c] mt-16">
+      <footer className="w-full bg-background border-t border-border mt-16">
         <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center sm:items-start gap-1">
-            <span className="font-mono text-xs font-bold text-[#f4f3fb] tracking-tight flex items-center gap-2">
+            <span className="font-mono text-xs font-bold text-foreground tracking-tight flex items-center gap-2">
               <Bot className="size-4 text-[#b87cf8]" />
               CleanAgent AI
             </span>
-            <span className="font-mono text-[10px] text-[#9a98b0]">
+            <span className="font-mono text-[10px] text-muted-foreground">
               AI-powered autonomous yield & CVI compliance engine
             </span>
-            <span className="font-mono text-[10px] text-[#9a98b0]/60">
+            <span className="font-mono text-[10px] text-muted-foreground/60">
               Cleanverse Capability #8 &middot; Track 02 (Compliant DeFi)
             </span>
           </div>
 
-          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-xs text-[#9a98b0]">
-            <button onClick={() => setActiveTab('chat')} className="hover:text-[#f4f3fb] transition-colors">Agent Chat</button>
-            <button onClick={() => setActiveTab('control')} className="hover:text-[#f4f3fb] transition-colors">Dashboard</button>
-            <button onClick={() => setActiveTab('pools')} className="hover:text-[#f4f3fb] transition-colors">Compliant Vaults</button>
-            <button onClick={() => setActiveTab('docs')} className="hover:text-[#f4f3fb] transition-colors">Docs</button>
+          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-xs text-muted-foreground">
+            <button onClick={() => setActiveTab('chat')} className="hover:text-foreground transition-colors">Chat</button>
+            <button onClick={() => setActiveTab('control')} className="hover:text-foreground transition-colors">Dashboard</button>
+            <button onClick={() => setActiveTab('pools')} className="hover:text-foreground transition-colors">Vaults</button>
+            <button onClick={() => setActiveTab('docs')} className="hover:text-foreground transition-colors">Docs</button>
             <a
               href="https://github.com/Webghost01-NG/cleanagent"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 hover:text-[#f4f3fb] transition-colors"
+              className="flex items-center gap-1.5 hover:text-foreground transition-colors"
             >
               GitHub <GitFork className="size-3" />
             </a>
