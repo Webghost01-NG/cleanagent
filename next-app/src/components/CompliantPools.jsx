@@ -12,10 +12,10 @@ export default function CompliantPools({ pools, mandate, onSelectPoolForRebalanc
   });
 
   return (
-    <div className="space-y-8 pt-4">
+    <div className="space-y-8 pt-4 font-sans">
       
       {/* Header Banner */}
-      <div className="theme-card p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="theme-card p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-2xl">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-mono text-xs font-bold uppercase flex items-center gap-1.5">
@@ -23,7 +23,7 @@ export default function CompliantPools({ pools, mandate, onSelectPoolForRebalanc
               CVI COUNTERPARTY MONITORING
             </span>
           </div>
-          <h2 className="text-3xl font-black theme-text">Target DeFi Yield Vaults & Compliance Ratings</h2>
+          <h2 className="text-3xl font-black theme-text font-sans">Target DeFi Yield Vaults & Compliance Ratings</h2>
           <p className="text-sm theme-text-muted">
             CleanAgent automatically queries **Cleanverse Verified Identity (CVI)** attestation contracts before rebalancing into any liquidity pool.
           </p>
@@ -52,88 +52,94 @@ export default function CompliantPools({ pools, mandate, onSelectPoolForRebalanc
         </div>
       </div>
 
-      {/* Yield Pool Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Responsive Widescreen 4-Column Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 font-mono">
         {filteredPools.map((pool) => (
-          <div 
+          <div
             key={pool.id}
-            className={`theme-card p-6 space-y-5 flex flex-col justify-between transition-all hover:scale-[1.02] ${
-              pool.isCVIVerified ? 'hover:border-emerald-500' : 'hover:border-rose-500 border-rose-500/30'
+            className={`theme-card p-6 rounded-2xl border transition-all hover:scale-[1.02] flex flex-col justify-between space-y-6 shadow-xl ${
+              pool.isCVIVerified
+                ? 'hover:border-emerald-500/50'
+                : 'hover:border-rose-500/50 opacity-90'
             }`}
           >
             <div className="space-y-4">
               
-              {/* Pool Header */}
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono text-purple-600 dark:text-purple-400 font-bold">{pool.chain}</span>
-                    <span className="text-xs font-mono theme-text-muted">•</span>
-                    <span className="text-xs font-mono theme-text-muted">{pool.protocol}</span>
-                  </div>
-                  <h3 className="text-xl font-bold theme-text mt-0.5">{pool.name}</h3>
-                </div>
+              {/* Badge & Chain Header */}
+              <div className="flex items-center justify-between">
+                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1.5 ${
+                  pool.isCVIVerified
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                    : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30'
+                }`}>
+                  {pool.isCVIVerified ? (
+                    <>
+                      <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                      CVI VERIFIED
+                    </>
+                  ) : (
+                    <>
+                      <ShieldAlert className="w-3 h-3 text-rose-500" />
+                      UNVERIFIED
+                    </>
+                  )}
+                </span>
 
-                {pool.isCVIVerified ? (
-                  <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-mono font-bold flex items-center gap-1 shrink-0">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                    CVI VERIFIED
-                  </span>
-                ) : (
-                  <span className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-[10px] font-mono font-bold flex items-center gap-1 shrink-0">
-                    <ShieldAlert className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
-                    UNVERIFIED
-                  </span>
-                )}
+                <span className="text-[10px] theme-text-muted font-bold">
+                  {pool.chain}
+                </span>
               </div>
 
-              {/* APY & TVL Highlight */}
-              <div className="theme-subcard p-4 rounded-xl flex items-center justify-between font-mono">
-                <div>
-                  <span className="text-[10px] theme-text-muted uppercase block">ESTIMATED YIELD</span>
-                  <span className="text-2xl font-black text-emerald-500 flex items-center gap-1">
-                    <TrendingUp className="w-5 h-5 text-emerald-500" />
-                    {pool.apyPercent}% <span className="text-xs theme-text-muted font-normal">APY</span>
+              {/* Pool Title & APY */}
+              <div>
+                <h3 className="text-xl font-black theme-text font-sans">{pool.name}</h3>
+                <p className="text-xs theme-text-muted">{pool.protocol}</p>
+              </div>
+
+              {/* Metrics Box */}
+              <div className="p-4 rounded-xl theme-subcard space-y-2 border theme-border">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs theme-text-muted flex items-center gap-1">
+                    <TrendingUp className="w-3.5 h-3.5 text-purple-500" />
+                    Current APY:
+                  </span>
+                  <span className="text-xl font-extrabold text-emerald-500">
+                    {pool.apyPercent}%
                   </span>
                 </div>
 
-                <div className="text-right">
-                  <span className="text-[10px] theme-text-muted uppercase block">POOL TVL</span>
-                  <span className="text-base font-bold theme-text">${(pool.tvlUSD / 1000000).toFixed(1)}M</span>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="theme-text-muted">Total Liquidity (TVL):</span>
+                  <span className="theme-text font-bold">${(pool.tvlUSD / 1000000).toFixed(1)}M USD</span>
+                </div>
+
+                <div className="flex justify-between items-center text-xs">
+                  <span className="theme-text-muted">Compliance Tier:</span>
+                  <span className="theme-text font-bold">{pool.complianceTier}</span>
                 </div>
               </div>
 
-              {/* Risk & Rules details */}
-              <div className="space-y-2 text-xs font-mono theme-text">
-                <div className="flex justify-between py-1 border-b theme-border">
-                  <span className="theme-text-muted">Risk Assessment:</span>
-                  <span className={`font-bold ${pool.riskRating === 'Low Risk' ? 'text-emerald-500' : pool.riskRating === 'Medium Risk' ? 'text-amber-500' : 'text-rose-500'}`}>
-                    {pool.riskRating}
-                  </span>
-                </div>
-
-                <div className="flex justify-between py-1 border-b theme-border">
-                  <span className="theme-text-muted">Compliance Requirement:</span>
-                  <span className="font-bold theme-text">{pool.complianceTier}</span>
-                </div>
+              {/* Contract Address Snippet */}
+              <div className="text-[10px] theme-text-muted flex justify-between items-center bg-black/5 dark:bg-white/5 p-2 rounded-lg">
+                <span>Contract Address:</span>
+                <span className="font-mono text-purple-600 dark:text-[#b87cf8] font-bold">
+                  {pool.contractAddress?.slice(0, 6)}...{pool.contractAddress?.slice(-4)}
+                </span>
               </div>
 
             </div>
 
-            {/* Action CTA */}
+            {/* Rebalance CTA Button */}
             <button
-              onClick={() => {
-                if (onSelectPoolForRebalance) onSelectPoolForRebalance(pool.id);
-              }}
-              className={`w-full py-3 px-4 rounded-xl text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                pool.isCVIVerified 
-                  ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/40' 
-                  : 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/40'
+              onClick={() => onSelectPoolForRebalance(pool.id)}
+              className={`w-full py-3.5 px-4 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                pool.isCVIVerified
+                  ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/20 hover:scale-[1.02]'
+                  : 'bg-rose-600/20 text-rose-500 border border-rose-500/30 hover:bg-rose-600 hover:text-white'
               }`}
             >
-              <Zap className="w-4 h-4" />
-              {pool.isCVIVerified ? 'Test Compliant Rebalance' : 'Test CVI 403 Revert'}
-              <ArrowUpRight className="w-4 h-4 opacity-70" />
+              <span>{pool.isCVIVerified ? 'Select For Rebalance' : 'Attempt Rebalance (Will Revert)'}</span>
+              <ArrowUpRight className="w-4 h-4" />
             </button>
 
           </div>

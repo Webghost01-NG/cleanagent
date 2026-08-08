@@ -187,8 +187,8 @@ export default function Home() {
         onToggleTheme={() => setIsDarkMode(!isDarkMode)}
       />
 
-      {/* Main Container */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-8">
+      {/* Main Fluid Widescreen Container */}
+      <main className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 md:px-12 py-6 flex-1 space-y-8">
         
         {/* Tab Views */}
         {loading ? (
@@ -305,9 +305,9 @@ export default function Home() {
         onConnectPhantom={handleConnectPhantom}
       />
 
-      {/* Footer */}
+      {/* Fluid Footer */}
       <footer className="w-full bg-background border-t theme-border mt-16">
-        <div className="max-w-6xl mx-auto px-6 py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 md:px-12 py-12 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center sm:items-start gap-1">
             <span className="font-mono text-xs font-bold theme-text tracking-tight flex items-center gap-2">
               <span className="size-5 rounded bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-500 dark:text-[#b87cf8] font-bold text-[10px]">C</span>

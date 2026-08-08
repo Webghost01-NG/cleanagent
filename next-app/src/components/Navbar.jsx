@@ -37,7 +37,7 @@ export default function Navbar({
 
   return (
     <header className="sticky top-0 z-50 w-full theme-border border-b theme-card backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div className="w-full max-w-[1600px] mx-auto flex h-16 items-center justify-between px-4 sm:px-8 md:px-12">
         
         {/* Left: Futuristic Brand Logo & Wordmark */}
         <div 
@@ -73,25 +73,30 @@ export default function Navbar({
               CLEAN<span className="text-purple-600 dark:text-[#b87cf8]">AGENT</span>
               <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-600 dark:text-purple-300 font-mono font-bold uppercase tracking-normal">AI</span>
             </span>
-            <span className="text-[9px] font-mono theme-text-muted tracking-tight hidden sm:block">Autonomous Monad Engine</span>
+            <span className="text-[9px] font-mono theme-text-muted tracking-tight hidden sm:block">
+              Autonomous Monad Engine
+            </span>
           </div>
         </div>
 
-        {/* Desktop Nav Links */}
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-1 font-sans text-xs font-medium">
-          {navLinks.map((link) => (
-            <button
-              key={link.id}
-              onClick={() => setActiveTab(link.id)}
-              className={`px-3.5 py-2 rounded-lg transition-all cursor-pointer ${
-                activeTab === link.id
-                  ? 'nav-tab-active font-bold'
-                  : 'theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e]'
-              }`}
-            >
-              {link.label}
-            </button>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = activeTab === link.id;
+            return (
+              <button
+                key={link.id}
+                onClick={() => setActiveTab(link.id)}
+                className={`px-3.5 py-2 rounded-lg transition-all cursor-pointer ${
+                  isActive
+                    ? 'nav-tab-active font-bold'
+                    : 'theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e]'
+                }`}
+              >
+                {link.label}
+              </button>
+            );
+          })}
 
           {/* Theme Toggle Button */}
           <button
@@ -99,10 +104,14 @@ export default function Navbar({
             className="ml-1 p-2 theme-text-muted hover:theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e] rounded-lg transition-colors cursor-pointer"
             title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
-            {isDarkMode ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4 text-purple-600" />}
+            {isDarkMode ? (
+              <Sun className="size-4 text-amber-400" />
+            ) : (
+              <Moon className="size-4 text-purple-600" />
+            )}
           </button>
 
-          {/* GitHub Repo Icon */}
+          {/* GitHub Repo Link */}
           <a
             href={GITHUB_URL}
             target="_blank"
@@ -123,7 +132,7 @@ export default function Navbar({
             <ChevronDown className="size-3 opacity-60" />
           </button>
 
-          {/* Get Started Pill Button */}
+          {/* Get Started CTA */}
           <button
             onClick={handleGetStartedClick}
             className="ml-2 inline-flex items-center rounded-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 font-mono text-[11px] tracking-wider font-bold uppercase shadow-lg shadow-purple-500/20 transition-all hover:scale-105 cursor-pointer"
@@ -132,7 +141,7 @@ export default function Navbar({
           </button>
         </nav>
 
-        {/* Mobile Menu Trigger */}
+        {/* Mobile Menu Button */}
         <div className="flex md:hidden items-center gap-1.5">
           <button
             onClick={onToggleTheme}
@@ -140,14 +149,12 @@ export default function Navbar({
           >
             {isDarkMode ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4 text-purple-600" />}
           </button>
-
           <button
             onClick={onOpenWalletModal}
             className="px-2.5 py-1.5 rounded-lg theme-subcard text-xs font-mono theme-text font-bold"
           >
             {shortAddress}
           </button>
-
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="p-2 theme-text hover:bg-slate-200 dark:hover:bg-[#1f1e2e] rounded-lg"
@@ -155,35 +162,36 @@ export default function Navbar({
             {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
         </div>
-
       </div>
 
-      {/* Mobile Dropdown */}
+      {/* Mobile Drawer */}
       {mobileOpen && (
-        <div className="md:hidden theme-border border-b theme-card px-4 py-4 space-y-2 font-mono text-xs">
-          {navLinks.map((link) => (
+        <div className="md:hidden border-t theme-border p-4 theme-card space-y-3 font-sans animate-in slide-in-from-top">
+          <nav className="flex flex-col gap-2">
+            {navLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => {
+                  setActiveTab(link.id);
+                  setMobileOpen(false);
+                }}
+                className={`p-2.5 rounded-xl text-left font-bold text-sm transition-colors ${
+                  activeTab === link.id ? 'bg-purple-600 text-white' : 'theme-text-muted hover:theme-text'
+                }`}
+              >
+                {link.label}
+              </button>
+            ))}
             <button
-              key={link.id}
               onClick={() => {
-                setActiveTab(link.id);
                 setMobileOpen(false);
+                handleGetStartedClick();
               }}
-              className={`w-full text-left px-3 py-2 rounded-lg font-bold ${
-                activeTab === link.id ? 'nav-tab-active' : 'theme-text-muted'
-              }`}
+              className="mt-2 w-full py-3 rounded-xl bg-purple-600 text-white font-mono font-bold text-xs uppercase"
             >
-              {link.label}
+              Get Started
             </button>
-          ))}
-          <button
-            onClick={() => {
-              setMobileOpen(false);
-              handleGetStartedClick();
-            }}
-            className="w-full text-center py-2.5 rounded-xl bg-purple-600 text-white font-bold font-mono uppercase"
-          >
-            Get Started
-          </button>
+          </nav>
         </div>
       )}
     </header>
