@@ -31,8 +31,10 @@ export async function POST(req) {
     const { targetPoolId = "pool-1", amountUSD = 15000 } = body;
 
     const mockPools = [
-      { id: "pool-1", name: "Monad Vault", isCVIVerified: true, apyPercent: 12.8 },
-      { id: "pool-4", name: "Shadow High-Yield Pool", isCVIVerified: false, apyPercent: 34.5 }
+      { id: "pool-1", name: "Monad Vault", isCVIVerified: true, apyPercent: 12.8, cviTier: "CVI Accredited Tier 1" },
+      { id: "pool-2", name: "Ethereum RWA Treasury Vault", isCVIVerified: true, apyPercent: 8.4, cviTier: "CVI Accredited Tier 1" },
+      { id: "pool-3", name: "Base Credit Vault", isCVIVerified: true, apyPercent: 9.6, cviTier: "CVI Standard Tier 2" },
+      { id: "pool-4", name: "Shadow High-Yield Pool", isCVIVerified: false, apyPercent: 34.5, cviTier: "Unverified" }
     ];
 
     const pool = mockPools.find(p => p.id === targetPoolId) || mockPools[0];
@@ -65,7 +67,7 @@ export async function POST(req) {
       timestamp: new Date().toISOString(),
       poolName: pool.name,
       amountUSD: amountUSD,
-      cviTier: "CVI Accredited Tier 1",
+      cviTier: pool.cviTier || "CVI Accredited Tier 1",
       txHash: newTxHash,
       gasUsed: `${(140000 + Math.floor(Math.random() * 20000)).toLocaleString()} Gwei`,
       status: "SUCCESS (0x1)"
