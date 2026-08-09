@@ -96,7 +96,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                 </tr>
               ) : (
                 filteredLogs.map((log) => {
-                  const blockNum = log.blockNumber || (14892100 + Number(log.recordId || 0));
+                  const blockNum = log.blockNumber || (24892400 + Number(log.recordId || 0));
                   return (
                     <tr key={log.id} className="hover:bg-slate-200 dark:hover:bg-[#1f1e2e] transition-colors cursor-pointer" onClick={() => setSelectedRecord(log)}>
                       <td className="p-4 font-bold text-purple-600 dark:text-purple-400">
