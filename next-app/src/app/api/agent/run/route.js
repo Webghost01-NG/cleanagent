@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { globalAuditLogs, addAuditRecord } from '@/lib/auditStore';
 
 function generateValidTxHash() {
   let hash = '0x';
@@ -9,26 +10,16 @@ function generateValidTxHash() {
   return hash;
 }
 
-let baseBlockHeight = 14892100;
-let auditLogs = [
-  {
-    id: 104,
-    recordId: 104,
-    blockNumber: 14892204,
-    timestamp: new Date().toISOString(),
-    poolName: "Monad Vault",
-    amountUSD: 15000,
-    cviTier: "CVI Accredited Tier 1",
-    txHash: "0x8f3c4e91a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7",
-    gasUsed: "142,500 Gwei",
-    status: "SUCCESS (0x1)"
-  }
-];
-
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { targetPoolId = "pool-1", amountUSD = 15000, maxSpendPerTxUSD = 100000, minRequiredYieldBps = 300 } = body;
+    const { 
+      targetPoolId = "pool-1", 
+      amountUSD = 15000, 
+      maxSpendPerTxUSD = 100000, 
+      minRequiredYieldBps = 300,
+      walletAddress = "0x2546BcD3c84621e976D8185a91A922aE77ECEc30"
+    } = body;
 
     const mockPools = [
       { id: "pool-1", name: "Monad Vault", isCVIVerified: true, apyPercent: 12.8, cviTier: "CVI Accredited Tier 1" },
@@ -66,15 +57,14 @@ export async function POST(req) {
       });
     }
 
-    const newRecordId = auditLogs.length + 105;
+    const newRecordId = globalAuditLogs.length + 105;
     const newTxHash = generateValidTxHash();
-    baseBlockHeight += Math.floor(Math.random() * 6) + 3;
 
-    const newRecord = {
+    const recordData = {
       id: newRecordId,
       recordId: newRecordId,
-      blockNumber: baseBlockHeight,
       timestamp: new Date().toISOString(),
+      walletAddress: walletAddress,
       poolName: pool.name,
       amountUSD: amountUSD,
       cviTier: pool.cviTier || "CVI Accredited Tier 1",
@@ -83,12 +73,12 @@ export async function POST(req) {
       status: "SUCCESS (0x1)"
     };
 
-    auditLogs.unshift(newRecord);
+    const newRecord = addAuditRecord(recordData);
 
     return NextResponse.json({
       success: true,
       blocked: false,
-      message: `Autonomous rebalance of $${amountUSD.toLocaleString()} USD into ${pool.name} approved & executed on Monad Testnet (Block #${baseBlockHeight})`,
+      message: `Autonomous rebalance of $${amountUSD.toLocaleString()} USD into ${pool.name} approved & executed on Monad Testnet (Block #${newRecord.blockNumber})`,
       auditRecord: newRecord
     });
   } catch (err) {
@@ -97,5 +87,5 @@ export async function POST(req) {
 }
 
 export async function GET() {
-  return NextResponse.json(auditLogs);
+  return NextResponse.json(globalAuditLogs);
 }

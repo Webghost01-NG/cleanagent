@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { Layers, ShieldCheck, CheckCircle2, ExternalLink, Hash, Clock, Copy, Check, Terminal, Cpu, Code2, Globe } from 'lucide-react';
+import { Layers, ShieldCheck, CheckCircle2, ExternalLink, Hash, Clock, Copy, Check, Terminal, Cpu, Code2, Globe, Wallet } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AgentAuditExplorer({ auditLogs = [] }) {
@@ -10,7 +10,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
   const [showRawRPC, setShowRawRPC] = useState(false);
 
   const shortHash = (hash) => hash ? `${hash.slice(0, 10)}...${hash.slice(-8)}` : '';
-  const shortAddress = (addr) => addr ? `${addr.slice(0, 8)}...${addr.slice(-6)}` : '';
+  const shortAddress = (addr) => addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '0x2546...c30a';
 
   const handleCopyHash = (txHash) => {
     navigator.clipboard.writeText(txHash);
@@ -22,6 +22,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
     const term = searchTerm.toLowerCase();
     return (
       log.txHash?.toLowerCase().includes(term) ||
+      log.walletAddress?.toLowerCase().includes(term) ||
       log.poolName?.toLowerCase().includes(term) ||
       log.recordId?.toString().includes(term) ||
       log.blockNumber?.toString().includes(term)
@@ -41,12 +42,12 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
             </span>
             <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs font-bold uppercase flex items-center gap-1.5">
               <Globe className="w-3.5 h-3.5 text-emerald-500" />
-              PUBLIC LEDGER (OPEN TO EVERYONE)
+              GLOBAL PUBLIC LEDGER ({auditLogs.length} TRANSACTIONS)
             </span>
           </div>
           <h2 className="text-3xl font-black theme-text font-sans">Mandate Execution Audit Trail</h2>
           <p className="text-sm theme-text-muted">
-            Every autonomous agent transaction, CVI clearance check, and spend mandate evaluation is publicly verifiable and immutably signed by `CVAAuditWrapper.sol`.
+            Every autonomous agent transaction executed by any user across Monad Testnet is publicly verifiable and immutably signed by `CVAAuditWrapper.sol`.
           </p>
         </div>
 
@@ -56,7 +57,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search Tx Hash, Block #, Pool..."
+            placeholder="Search Tx Hash, Wallet, Block #..."
             className="w-full theme-input theme-text text-xs p-3.5 rounded-xl focus:outline-none focus:border-purple-500 font-mono"
           />
         </div>
@@ -79,6 +80,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                 <th className="p-4">Record #</th>
                 <th className="p-4">Block Height</th>
                 <th className="p-4">Timestamp</th>
+                <th className="p-4">Wallet Signer</th>
                 <th className="p-4">Target Vault</th>
                 <th className="p-4">Rebalance Amount</th>
                 <th className="p-4">CVI Identity Tier</th>
@@ -88,7 +90,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
             <tbody className="divide-y theme-border theme-text">
               {filteredLogs.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="p-8 text-center theme-text-muted">
+                  <td colSpan="8" className="p-8 text-center theme-text-muted">
                     No matching audit records found. Run an Agent Execution Cycle on the Dashboard to generate records.
                   </td>
                 </tr>
@@ -108,6 +110,13 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                       <td className="p-4 theme-text-muted flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5 opacity-60 shrink-0" />
                         <span>{new Date(log.timestamp).toLocaleTimeString()}</span>
+                      </td>
+
+                      <td className="p-4 font-mono font-bold text-purple-600 dark:text-[#b87cf8]">
+                        <span className="flex items-center gap-1.5">
+                          <Wallet className="w-3 h-3 opacity-70 shrink-0" />
+                          <span>{shortAddress(log.walletAddress)}</span>
+                        </span>
                       </td>
 
                       <td className="p-4 font-bold theme-text max-w-xs truncate">
@@ -226,8 +235,8 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                   </div>
 
                   <div className="p-3.5 rounded-xl theme-subcard space-y-1 overflow-hidden">
-                    <span className="text-[10px] theme-text-muted uppercase font-bold block">TARGET VAULT</span>
-                    <span className="theme-text font-bold block truncate">{selectedRecord.poolName}</span>
+                    <span className="text-[10px] theme-text-muted uppercase font-bold block">WALLET SIGNER</span>
+                    <span className="theme-text font-bold block truncate font-mono text-purple-500">{selectedRecord.walletAddress || '0x2546...c30a'}</span>
                   </div>
 
                   <div className="p-3.5 rounded-xl theme-subcard space-y-1">
@@ -278,7 +287,7 @@ export default function AgentAuditExplorer({ auditLogs = [] }) {
                       <p className="pl-4">{`"result": {`}</p>
                       <p className="pl-8">{`"hash": "${selectedRecord.txHash}",`}</p>
                       <p className="pl-8">{`"blockNumber": "0x${(selectedRecord.blockNumber || 14892204).toString(16)}",`}</p>
-                      <p className="pl-8">{`"from": "0x2546bcd3c84621e976D8185a91A922aE77ECEc30",`}</p>
+                      <p className="pl-8">{`"from": "${selectedRecord.walletAddress || '0x2546bcd3c84621e976D8185a91A922aE77ECEc30'}",`}</p>
                       <p className="pl-8">{`"to": "0x7a834e9100000000000000000000000000004e91",`}</p>
                       <p className="pl-8">{`"value": "0x0",`}</p>
                       <p className="pl-8">{`"gasUsed": "0x22cb4",`}</p>
