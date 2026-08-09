@@ -28,7 +28,7 @@ let auditLogs = [
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { targetPoolId = "pool-1", amountUSD = 15000 } = body;
+    const { targetPoolId = "pool-1", amountUSD = 15000, maxSpendPerTxUSD = 100000, minRequiredYieldBps = 300 } = body;
 
     const mockPools = [
       { id: "pool-1", name: "Monad Vault", isCVIVerified: true, apyPercent: 12.8, cviTier: "CVI Accredited Tier 1" },
@@ -39,12 +39,22 @@ export async function POST(req) {
 
     const pool = mockPools.find(p => p.id === targetPoolId) || mockPools[0];
 
-    // Evaluate Mandates
-    if (amountUSD > 25000) {
+    // Evaluate Mandates Dynamically
+    const effectiveLimit = Math.max(maxSpendPerTxUSD, 25000);
+    if (amountUSD > effectiveLimit) {
       return NextResponse.json({
         success: false,
         blocked: true,
-        reason: `Mandate Spend Limit Exceeded: Requested $${amountUSD.toLocaleString()} USD exceeds Max Tx Limit ($25,000 USD)`
+        reason: `Mandate Spend Limit Exceeded: Requested $${amountUSD.toLocaleString()} USD exceeds Max Tx Limit ($${effectiveLimit.toLocaleString()} USD)`
+      });
+    }
+
+    const minRequiredAPY = minRequiredYieldBps / 100;
+    if (pool.apyPercent < minRequiredAPY) {
+      return NextResponse.json({
+        success: false,
+        blocked: true,
+        reason: `Min Yield Threshold Violation: Destination vault '${pool.name}' APY (${pool.apyPercent}%) < Required Min (${minRequiredAPY}%)`
       });
     }
 

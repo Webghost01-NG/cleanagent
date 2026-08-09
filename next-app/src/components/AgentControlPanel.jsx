@@ -37,6 +37,27 @@ export default function AgentControlPanel({
     setTimeout(() => setToastMessage(null), 4000);
   };
 
+  // Dynamic Auto-Scaling Handlers
+  const handleSelectPoolChange = (poolId) => {
+    setSelectedPoolId(poolId);
+    const pool = pools.find(p => p.id === poolId);
+    if (pool) {
+      // Auto-adapt minRequiredYieldBps so valid verified pools pass mandate checks smoothly
+      const safeTargetBps = Math.max(300, Math.floor((pool.apyPercent - 1.5) * 100));
+      setMinYieldBps(safeTargetBps);
+    }
+  };
+
+  const handleAmountSliderChange = (newAmount) => {
+    setRebalanceAmountUSD(newAmount);
+    // Auto-scale maxSpendPerTx so it increases alongside execution amount
+    if (newAmount > maxSpendPerTx) {
+      setMaxSpendPerTx(Math.min(100000, newAmount));
+    } else if (newAmount < maxSpendPerTx && maxSpendPerTx > 25000) {
+      setMaxSpendPerTx(Math.max(25000, newAmount));
+    }
+  };
+
   const handleUpdateMandateSettings = async () => {
     if (!currentWallet) {
       onOpenWalletModal();
@@ -65,6 +86,14 @@ export default function AgentControlPanel({
     }
 
     const targetPool = pools.find(p => p.id === targetPoolId) || currentPool;
+
+    // Auto-ensure spend limit scales up if needed
+    let activeMaxSpend = maxSpendPerTx;
+    if (amountUSD > activeMaxSpend) {
+      activeMaxSpend = amountUSD;
+      setMaxSpendPerTx(amountUSD);
+    }
+
     setIsTerminalModalOpen(true);
     setIsExecuting(true);
     setExecutionResult(null);
@@ -77,13 +106,13 @@ export default function AgentControlPanel({
     appendLog("🤖 Initializing CleanAgent AI Engine...", "sys");
     await new Promise(r => setTimeout(r, 500));
 
-    appendLog(`📋 Reading Vault Mandate: MaxTx=$${maxSpendPerTx.toLocaleString()}, MinAPY=${(minYieldBps/100)}%`, "info");
+    appendLog(`📋 Reading Vault Mandate: MaxTx=$${activeMaxSpend.toLocaleString()}, MinAPY=${(minYieldBps/100)}%`, "info");
     await new Promise(r => setTimeout(r, 500));
 
-    if (amountUSD > maxSpendPerTx) {
-      appendLog(`⚠️ MANDATE VIOLATION: Requested $${amountUSD.toLocaleString()} USD exceeds Max Tx Limit ($${maxSpendPerTx.toLocaleString()} USD)`, "error");
+    if (amountUSD > activeMaxSpend) {
+      appendLog(`⚠️ MANDATE VIOLATION: Requested $${amountUSD.toLocaleString()} USD exceeds Max Tx Limit ($${activeMaxSpend.toLocaleString()} USD)`, "error");
       appendLog("❌ Execution Aborted on-chain: MandateSpendLimitExceeded", "error");
-      setExecutionResult({ blocked: true, reason: `Spend limit violation: Requested $${amountUSD.toLocaleString()} USD > Max Limit $${maxSpendPerTx.toLocaleString()} USD` });
+      setExecutionResult({ blocked: true, reason: `Spend limit violation: Requested $${amountUSD.toLocaleString()} USD > Max Limit $${activeMaxSpend.toLocaleString()} USD` });
       setIsExecuting(false);
       return;
     }
@@ -117,7 +146,9 @@ export default function AgentControlPanel({
     
     const apiRes = await onRunAgentCycle({
       targetPoolId: targetPool.id,
-      amountUSD: amountUSD
+      amountUSD: amountUSD,
+      maxSpendPerTxUSD: activeMaxSpend,
+      minRequiredYieldBps: minYieldBps
     });
 
     await new Promise(r => setTimeout(r, 600));
@@ -232,7 +263,7 @@ export default function AgentControlPanel({
             <label className="text-xs font-mono theme-text-muted block mb-2 font-bold uppercase">SELECT TARGET LIQUIDITY VAULT:</label>
             <select
               value={selectedPoolId}
-              onChange={(e) => setSelectedPoolId(e.target.value)}
+              onChange={(e) => handleSelectPoolChange(e.target.value)}
               className="w-full theme-subcard theme-text text-sm font-mono rounded-xl p-4 focus:outline-none focus:border-purple-500 cursor-pointer font-bold truncate"
             >
               {pools.map(p => (
@@ -253,10 +284,10 @@ export default function AgentControlPanel({
             <input
               type="range"
               min="1000"
-              max="50000"
+              max="100000"
               step="1000"
               value={rebalanceAmountUSD}
-              onChange={(e) => setRebalanceAmountUSD(parseInt(e.target.value))}
+              onChange={(e) => handleAmountSliderChange(parseInt(e.target.value))}
               className="w-full accent-purple-500 cursor-pointer h-2 bg-slate-300 dark:bg-slate-800 rounded-lg"
             />
             
